@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PushTest_V0.0.0 : MonoBehaviour {
 
+    public int butts;
+
 	// Use this for initialization
 	void Start () {
 		
