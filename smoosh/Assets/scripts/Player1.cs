@@ -7,9 +7,12 @@ public class Player1 : MonoBehaviour {
     public GameObject hbqueue;
     HBQ hbq;
 
+    hitbox currentHB;
+
     public Vector3 pos;
     public Rigidbody p1;
     public Renderer p1rend;
+    public int thisPlayer;
     public string p1s;
     public float wgt;
     public float walkspd;
@@ -48,14 +51,26 @@ public class Player1 : MonoBehaviour {
     public bool runoff;
     public bool facingr1;
 
+    public bool isHit;
+    int hitstun;
+    int hitstuntimer;
+    int dmg;
+
+    public int lag;
+
+    RaycastHit hit;
 
     // Use this for initialization
     void Start () {
+        int dmg = 0;
+        thisPlayer = 1;
 		p1 = GetComponent<Rigidbody>();
         p1rend= GetComponent<Renderer>();
 
         p1rend.material.color = Color.yellow;
         p1s = "walk";
+
+        isHit = false;
 
         walkspd = 10;
         runspd = 15;
@@ -89,6 +104,13 @@ public class Player1 : MonoBehaviour {
         oneframe = 0;
         runoff = false;
         facingr1 = true;
+
+        lag = 0;
+
+        hitstun = 0;
+        hitstuntimer = 0;
+
+        
     }
 	
 	// Update is called once per frame
@@ -108,6 +130,11 @@ public class Player1 : MonoBehaviour {
         //freeze - black
         //crawl - magenta
         //
+
+        if (isHit)
+        {
+            p1s = "hitstun";
+        }
 
         switch(p1s)
         {
@@ -190,7 +217,28 @@ public class Player1 : MonoBehaviour {
                     shieldtimer = 3;
                 }
 
-           
+                if (UnityEngine.Input.GetKeyDown(KeyCode.Space)) //check cooldown, charges
+                {
+                    p1s = "attacking";
+                    lag = 60;
+                    hbq = hbqueue.GetComponent<HBQ>();
+                    hbq.DeQ(15, .2f,55,Vector3.right, true, Vector3.zero,
+                        1,Vector3.up,5,5,false,0,50,10);
+                    //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
+                    //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
+                }
+
+                if (UnityEngine.Input.GetMouseButtonDown(1))
+                {
+                    p1s = "attacking";
+                    lag = 10;
+                    hbq = hbqueue.GetComponent<HBQ>();
+                    hbq.DeQ(15, .5f, 200, Vector3.right, false, Vector3.zero,
+                        2, Vector3.up, 10, 0, false, 0, 150, 10);
+                    //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
+                    //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
+                }
+
 
                 break;
 
@@ -291,7 +339,13 @@ public class Player1 : MonoBehaviour {
                 {
                     p1.AddForce(-transform.up * fallspd);
                 }
-                
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.Space))
+                {
+                    p1s = "attacking";
+                    lag = 60;
+                }
+
 
                 if (land)
                 {
@@ -305,6 +359,67 @@ public class Player1 : MonoBehaviour {
 
             case "attacking":
                 p1rend.material.color = Color.green;
+
+                if (lag >0)
+                {
+                    lag--;
+                    if (Physics.Raycast(transform.position,-Vector3.up,out hit, .01f ))
+                    {
+                        if (hit.collider.tag == "stage")
+                        {
+                            if (lag==0)
+                            {
+                                p1s = "walk";
+                            }
+                        } else
+                        {
+                            if (UnityEngine.Input.GetKey(KeyCode.A))
+                            {
+                                p1.AddForce(-transform.right * airspd);
+                            }
+
+                            if (UnityEngine.Input.GetKey(KeyCode.D))
+                            {
+                                p1.AddForce(transform.right * airspd);
+                            }
+
+                            if (UnityEngine.Input.GetKey(KeyCode.S))
+                            {
+                                p1.AddForce(-transform.up * fallspd);
+                            }
+
+
+                            if (lag == 0)
+                            {
+                                p1s = "airborn";
+                            }
+                        }
+                    } else
+                    {
+                        if (UnityEngine.Input.GetKey(KeyCode.A))
+                        {
+                            p1.AddForce(-transform.right * airspd);
+                        }
+
+                        if (UnityEngine.Input.GetKey(KeyCode.D))
+                        {
+                            p1.AddForce(transform.right * airspd);
+                        }
+
+                        if (UnityEngine.Input.GetKey(KeyCode.S))
+                        {
+                            p1.AddForce(-transform.up * fallspd);
+                        }
+
+                        if (lag == 0)
+                        {
+                            p1s = "airborn";
+                        }
+                    }
+                }
+                
+
+
                 break;
 
 
@@ -345,6 +460,70 @@ public class Player1 : MonoBehaviour {
 
             case "hitstun":
                 p1rend.material.color = Color.red;
+                if (hitstuntimer > 0)
+                {
+                    //Debug.Log("ah shit 1", gameObject);
+                    if (hitstuntimer == hitstun)
+                    {
+                        //Debug.Log("ah shit 2", gameObject);
+                        isHit = false;
+                        p1.velocity = Vector3.zero;
+                        //p1.velocity = (currentHB.bkb+currentHB.skb*dmg)*currentHB.angle;
+                        p1.AddForce ((currentHB.bkb + currentHB.skb * dmg) * currentHB.angle);
+                    }
+
+                    hitstuntimer--;
+                    //two frames of hitLAG give increased directional influence, otherwise, DI is low during hitstun
+
+                    if (hitstun - hitstuntimer < 3)
+                    {
+                        if (UnityEngine.Input.GetKey(KeyCode.A))
+                        {
+                            p1.AddForce(-transform.right * airspd *3);
+                        }
+
+                        if (UnityEngine.Input.GetKey(KeyCode.D))
+                        {
+                            p1.AddForce(transform.right * airspd *3);
+                        }
+                    } else
+                    {
+                        if (UnityEngine.Input.GetKey(KeyCode.A))
+                        {
+                            p1.AddForce(-transform.right * airspd * .1f);
+                        }
+
+                        if (UnityEngine.Input.GetKey(KeyCode.D))
+                        {
+                            p1.AddForce(transform.right * airspd * .1f);
+                        }
+                    }
+
+                }
+                
+                //return to an acting state !!!! needs a few safety checks!!!!
+                if (hitstuntimer == 0)
+                {
+                    if (Physics.Raycast(transform.position, -Vector3.up, out hit, .01f))
+                    {
+                        if (hit.collider.tag == "stage")
+                        {
+
+                            p1s = "walk";
+
+                        }
+                        else
+                        {
+                            p1s = "airborn";
+                        }
+                    }
+                    else
+                    {
+                        p1s = "airborn";
+                    }
+                }
+               
+
                 break;
 
 
@@ -396,6 +575,7 @@ public class Player1 : MonoBehaviour {
 
     }
 
+    /*
     void OnTriggerEnter(Collider collider)
     {
         Debug.Log(collider + "dildos");
@@ -406,7 +586,29 @@ public class Player1 : MonoBehaviour {
             runoff = true;
         }
     }
+    */
 
+    //hitbox interaction
+    void OnTriggerEnter(Collider collider)
+    {
+        //Debug.Log(collider + "dildos");
+        if (collider.tag == "hitbox")
+        {
+            currentHB = collider.GetComponent<hitbox>();
+            if ( (currentHB.playerNum != thisPlayer) && currentHB.special =="" && isHit == false)
+            {
+                //Debug.Log("extra dildos");
+                p1rend.material.color = Color.magenta;
+                isHit = true;
+                hitstun = 2*currentHB.dmg; //!!!! this is a temporary hitstun formula!!!!
+                hitstuntimer = hitstun;
+                dmg += currentHB.dmg;
+                //Debug.Log("hs"+hitstun, gameObject);
+                //Debug.Log("hst"+hitstuntimer, gameObject);
+            }
+            
+        }
+    }
 
 
 }

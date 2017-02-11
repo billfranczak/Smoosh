@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PushTest_V0.0.0 : MonoBehaviour {
+public class PushTest_V0 : MonoBehaviour {
 
     public int butts;
 

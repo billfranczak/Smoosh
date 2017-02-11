@@ -10,10 +10,11 @@ public class hitbox : MonoBehaviour {
     Player1 p1;
     HBQ q;
     public Transform pos;
+    public Renderer hbrend;
 
     //properties of a hitbox used imminently
     public bool active; //turns on hitbox
-    public int activeOn; //first frame hitbox becomes active
+    public int activeOn; //first frame hitbox becomes active -- !!!!move activeOn to player, to prevent attacks from happening if a player is interupted!!!!
     public float size;
     public int duration;
     public Vector3 location;
@@ -26,7 +27,7 @@ public class hitbox : MonoBehaviour {
 
     //properties that are only important on contact
     public int playerNum; //who spawned the hitbox
-    public float angle; //angle the victom is sent off at
+    public Vector3 angle; //angle the victom is sent off at
     public int dmg;
     public int sdmg; //sheild dmg
     public bool grab; //grabs >> shields
@@ -44,6 +45,8 @@ public class hitbox : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        hbrend = GetComponent<Renderer>();
+
         special = "";
         clanked = false;
         active = false;
@@ -52,6 +55,9 @@ public class hitbox : MonoBehaviour {
         p1 = player1.GetComponent<Player1>();
         q = queue.GetComponent<HBQ>();
         size = 0.3f;
+
+        hbrend.material.color = Color.yellow;
+
     }
 	
 	// Update is called once per frame
@@ -59,16 +65,19 @@ public class hitbox : MonoBehaviour {
 
         if (duration > 0)
         {
+            p1 = player1.GetComponent<Player1>(); //refactor potential
             duration--;
+            //Debug.Log("Yo it's in!", gameObject);
             if (activeOn > 0) {
                 activeOn--;
                 if (activeOn == 0)
                 {
                     active = true;
                     pos.position = player1.transform.position + location;
+                    hbrend.material.color = Color.red;
                 }
             }
-            p1 = player1.GetComponent<Player1>(); //refactor potential
+            
             //pos.position = size; rescale the hitbox
             pos.transform.localScale = new Vector3(size, size, size);
             if (tethered)
@@ -83,6 +92,7 @@ public class hitbox : MonoBehaviour {
             //return to offscreen position
             if (duration==0 || clanked) {
                 pos.position = new Vector3(-10, 5, 3);
+                hbrend.material.color = Color.yellow;
                 clanked = false;
                 active = false;
                 //push into q

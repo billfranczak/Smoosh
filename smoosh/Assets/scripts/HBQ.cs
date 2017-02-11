@@ -15,6 +15,7 @@ public class HBQ : MonoBehaviour {
         hitboxes.Clear();
         foreach (GameObject h in gethitboxes)
         {
+            //Debug.Log("Yo it's in!", gameObject);
             hitboxes.Add(h.GetComponent<hitbox>());
         }
     }
@@ -28,12 +29,36 @@ public class HBQ : MonoBehaviour {
     {
         hitboxes.Add(h);
     }
-
-    public void DeQ () //give the first entry on the hitbox list the desired properties and remove it from the list of unused hitboxes
+   
+    public void DeQ (int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, 
+        int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
     {
-        currentHB = hitboxes[1]; //refactor potential
-        hitboxes.Remove(hitboxes[1]);
+        //Debug.Log("1", gameObject);
+        currentHB = hitboxes[0]; //refactor potential
+        //Debug.Log("2", gameObject);
+        hitboxes.Remove(hitboxes[0]);
+        //Debug.Log("3", gameObject);
+        currentHB.activeOn = activeOn;
+        currentHB.size = size;
+        currentHB.duration = duration;
+        currentHB.location = location;
+        currentHB.tethered = tethered;
+        currentHB.direction = direction;
+
+        currentHB.playerNum = playerNum;
+        currentHB.angle = angle;
+        currentHB.dmg = dmg;
+        currentHB.sdmg = sdmg;
+        currentHB.grab = grab;
+        currentHB.priority = priority;
+        currentHB.bkb = bkb;
+        currentHB.skb = skb;
+
+
         //assign paramters
     }
+    //DeQ parameter list:
+    //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
+    //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
 
 }

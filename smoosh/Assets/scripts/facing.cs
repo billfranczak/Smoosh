@@ -15,7 +15,8 @@ public class facing : MonoBehaviour {
     void Start () {
         facingr = true;
         pos = GetComponent<Transform>();
-        
+
+        p1 = player1.GetComponent<Player1>();
         facingr = p1.facingr1;
     }
 	
