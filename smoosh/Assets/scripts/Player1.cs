@@ -370,6 +370,15 @@ public class Player1 : MonoBehaviour {
                             if (lag==0)
                             {
                                 p1s = "walk";
+                                land = false;
+                                runoff = false;
+                                dashtimer = 0;
+                                shieldtimer = 0;
+                                dtrtimer = 0;
+                                okcrawl = false;
+                                standuptimer = 0;
+
+                                jumps = maxjumps;
                             }
                         } else
                         {
@@ -392,6 +401,15 @@ public class Player1 : MonoBehaviour {
                             if (lag == 0)
                             {
                                 p1s = "airborn";
+
+                                land = false;
+                                runoff = false;
+                                dashtimer = 0;
+                                shieldtimer = 0;
+                                lag = 0;
+                                dtrtimer = 0;
+                                okcrawl = false;
+                                standuptimer = 0;
                             }
                         }
                     } else
@@ -510,16 +528,54 @@ public class Player1 : MonoBehaviour {
                         {
 
                             p1s = "walk";
+                            land = false;
+                            runoff = false;
+                            dashtimer = 0;
+                            shieldtimer = 0;
+                            lag = 0;
+                            dtrtimer = 0;
+                            okcrawl = false;
+                            standuptimer = 0;
+
+                            jumps = maxjumps;
 
                         }
                         else
                         {
+                            Debug.Log("out of hitstun 1", gameObject);
                             p1s = "airborn";
+                            land = false;
+                            runoff = false;
+                            dashtimer = 0;
+                            shieldtimer = 0;
+                            lag = 0;
+                            dtrtimer = 0;
+                            okcrawl = false;
+                            standuptimer = 0;
+
+                            if (jumps == maxjumps)
+                            {
+                                jumps--;
+                            }
                         }
                     }
                     else
                     {
+                        Debug.Log("out of hitstun 2", gameObject);
                         p1s = "airborn";
+                        land = false;
+                        runoff = false;
+                        dashtimer = 0;
+                        shieldtimer = 0;
+                        lag = 0;
+                        dtrtimer = 0;
+                        okcrawl = false;
+                        standuptimer = 0;
+
+                        if (jumps == maxjumps)
+                        {
+                            jumps--;
+                        }
                     }
                 }
                
