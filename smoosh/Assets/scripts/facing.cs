@@ -22,7 +22,7 @@ public class facing : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        p1 = player1.GetComponent<Player1>();
+       
         facingr = p1.facingr1;
 
         if (facingr)

@@ -542,7 +542,7 @@ public class Player1 : MonoBehaviour {
                         }
                         else
                         {
-                            Debug.Log("out of hitstun 1", gameObject);
+                           // Debug.Log("out of hitstun 1", gameObject);
                             p1s = "airborn";
                             land = false;
                             runoff = false;
@@ -561,7 +561,7 @@ public class Player1 : MonoBehaviour {
                     }
                     else
                     {
-                        Debug.Log("out of hitstun 2", gameObject);
+                        //Debug.Log("out of hitstun 2", gameObject);
                         p1s = "airborn";
                         land = false;
                         runoff = false;

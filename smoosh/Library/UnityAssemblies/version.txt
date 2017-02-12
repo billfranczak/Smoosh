@@ -1,10 +1,4 @@
 5.5.0f3:2.3.0.0
 StandaloneWindows
 Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/Managed/UnityEngine.dll
-Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll
-Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll
-Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/UnityExtensions/Unity/PlaymodeTestsRunner/UnityEngine.PlaymodeTestsRunner.dll
-Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll
-Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll
-Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll
 Y:/Default Program/Work/Unity 5.5.0f3/Editor/Data/Managed/UnityEditor.dll
