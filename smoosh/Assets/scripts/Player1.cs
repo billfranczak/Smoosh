@@ -10,11 +10,12 @@ public class Player1 : MonoBehaviour {
     hitbox currentHB;
 
     public Vector3 pos;
-    public Rigidbody p1;
+    public Rigidbody p1;  //this could be named better
     public Renderer p1rend;
     public int thisPlayer;
     public string p1s;
     public float wgt;
+    public float walkaccel;
     public float walkspd;
     public float crawlspd;
     public float runspd;
@@ -71,8 +72,8 @@ public class Player1 : MonoBehaviour {
         p1s = "walk";
 
         isHit = false;
-
-        walkspd = 10;
+        walkaccel = 30;
+        walkspd = 3;
         runspd = 15;
         crawlspd = 8;
 
@@ -139,9 +140,11 @@ public class Player1 : MonoBehaviour {
         switch(p1s)
         {
             case "walk":
+                //Color Debug State
                 p1rend.material.color = Color.yellow;
 
-                
+                //-Ian to Bill -- what is this check doing, it looks like it is looking
+                //at wether or not we are dashing to see if we can crouch??? is crouch still in?
                 if (dashtimer > 0 )
                 {
                     okcrawl = false;
@@ -172,7 +175,10 @@ public class Player1 : MonoBehaviour {
                     }
                     else
                     {
-                        p1.AddForce(-transform.right * walkspd);
+                        if (p1.velocity.x > -walkspd)
+                        {
+                            p1.AddForce(-transform.right * walkaccel);
+                        }
                     }
                 }
 
@@ -186,7 +192,11 @@ public class Player1 : MonoBehaviour {
                     }
                     else
                     {
-                        p1.AddForce(transform.right * walkspd);
+                        
+                        if (p1.velocity.x < walkspd )
+                        {
+                            p1.AddForce(transform.right * walkaccel);
+                        }
                     }
                 }
 
@@ -665,6 +675,8 @@ public class Player1 : MonoBehaviour {
             
         }
     }
+
+   
 
 
 }
