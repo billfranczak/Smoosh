@@ -12,12 +12,14 @@ public class Player1 : MonoBehaviour {
     public Vector3 pos;
     public Rigidbody p1;  //this could be named better
     public Renderer p1rend;
+    public Transform temptrans;
     public int thisPlayer;
     public string p1s;
     public float wgt;
     public float walkaccel;
     public float walkspd;
     public float crawlspd;
+    public float runaccel;
     public float runspd;
     public float dashl;
     //public float airspd;
@@ -56,9 +58,20 @@ public class Player1 : MonoBehaviour {
     public bool facingr1;
 
     public bool isHit;
-    int hitstun;
-    int hitstuntimer;
-    int dmg;
+    public int hitstun;
+    public int hitstuntimer;
+    public int dmg;
+
+    public int lrunofftimer;
+    public int rrunofftimer;
+    public int maxrunofftimer;
+    public bool lrunoffstall;
+    public bool rrunoffstall;
+    public int landOrRegrabtimer;
+    public int maxLandRegrab;
+
+    public float capsuleVOffset;
+
 
     public int lag;
 
@@ -77,7 +90,8 @@ public class Player1 : MonoBehaviour {
         isHit = false;
         walkaccel = 30;
         walkspd = 3;
-        runspd = 15;
+        runaccel = 60;
+        runspd = 8;
         crawlspd = 8;
 
         airMaxSpeed = 3;
@@ -85,7 +99,7 @@ public class Player1 : MonoBehaviour {
         fallSpdMax = 3;
         fallAccel = 20;
         gjumphgt = 250;
-        ajumphgt = 200;
+        ajumphgt = 350;
         jumpmaxcd = 10;
         maxjumps = 2;
         jumps = 2;
@@ -116,7 +130,18 @@ public class Player1 : MonoBehaviour {
         hitstun = 0;
         hitstuntimer = 0;
 
-        
+
+        maxrunofftimer = 5;
+        //lrunofftimer = maxrunofftimer;
+        //rrunofftimer = maxrunofftimer;
+        lrunofftimer = 0;
+        rrunofftimer = 0;
+        lrunoffstall = false;
+        rrunoffstall = false;
+        landOrRegrabtimer = 0;
+        maxLandRegrab = 10;
+
+        capsuleVOffset = .31f;
     }
 	
 	// Update is called once per frame
@@ -142,7 +167,33 @@ public class Player1 : MonoBehaviour {
             p1s = "hitstun";
         }
 
-        switch(p1s)
+        //for some reason, capsule is not triggering "onTriggerStay". This is a temp solution
+        if (Physics.Raycast(transform.position, -Vector3.up, out hit, capsuleVOffset) ) {
+            if (hit.collider.tag == "lrunoff" && (p1s=="walk" || p1s == "run" || p1s == "dash" ))
+            {
+                //Debug.Log("stay");
+                if (lrunofftimer > 0)
+                {
+                    lrunofftimer--;
+
+                }
+
+            }
+            if (hit.collider.tag == "rrunoff")
+            {
+                if (rrunofftimer > 0)
+                {
+                    rrunofftimer--;
+                }
+            }
+        }
+        if (landOrRegrabtimer>0)
+        {
+            landOrRegrabtimer--;
+        }
+       
+
+        switch (p1s)
         {
             case "walk":
                 //Color Debug State
@@ -150,6 +201,8 @@ public class Player1 : MonoBehaviour {
 
                 //-Ian to Bill -- what is this check doing, it looks like it is looking
                 //at wether or not we are dashing to see if we can crouch??? is crouch still in?
+
+                //-Bill to Ian -- yea, that's what it does
                 if (dashtimer > 0 )
                 {
                     okcrawl = false;
@@ -162,10 +215,13 @@ public class Player1 : MonoBehaviour {
 
                 if (runoff)
                 {
+                    //Debug.Log("walk - runoff");
                     p1s = "airborn";
                     jumps--;
                     land = false;
                     runoff = false;
+                    dashtimer = 0;
+                    //impart maxwalkspeed in direction we are facing
                 }
 
                 //input
@@ -180,9 +236,14 @@ public class Player1 : MonoBehaviour {
                     }
                     else
                     {
-                        if (p1.velocity.x > -walkspd)
+                        if (p1.velocity.x > -walkspd && !(lrunoffstall && lrunofftimer>0))
                         {
                             p1.AddForce(-transform.right * walkaccel);
+                        }
+                        if (lrunofftimer == 0 && lrunoffstall == true)
+                        {
+                            runoff = true;
+                            landOrRegrabtimer = maxLandRegrab;
                         }
                     }
                 }
@@ -198,9 +259,14 @@ public class Player1 : MonoBehaviour {
                     else
                     {
                         
-                        if (p1.velocity.x < walkspd )
+                        if (p1.velocity.x < walkspd && !(rrunoffstall && rrunofftimer > 0))
                         {
                             p1.AddForce(transform.right * walkaccel);
+                        }
+                        if (rrunofftimer == 0 && rrunoffstall == true)
+                        {
+                            runoff = true;
+                            landOrRegrabtimer = maxLandRegrab;
                         }
                     }
                 }
@@ -212,6 +278,7 @@ public class Player1 : MonoBehaviour {
                     jumpcd = jumpmaxcd;
                     jumps--;
                     land = false;
+                    //Debug.Log("walk jump");
                 }
 
                 if (UnityEngine.Input.GetKeyDown(KeyCode.S))
@@ -219,6 +286,19 @@ public class Player1 : MonoBehaviour {
                     dashtimer = dashwindow;
                 }
 
+                //doubletap dash
+                /*
+                if (UnityEngine.Input.GetKeyDown(KeyCode.D))
+                {
+                    dashtimer = dashwindow;
+                }
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.A))
+                {
+                    dashtimer = dashwindow;
+                }
+                */
+                
                 if (UnityEngine.Input.GetKey(KeyCode.S) && dashtimer == 0)
                 {
                     standuptimer = crawlToStand;
@@ -277,10 +357,12 @@ public class Player1 : MonoBehaviour {
 
                     if (runoff)
                     {
+                        
                         p1s = "airborn";
                         jumps--;
                         land = false;
                         runoff = false;
+                        dashtimer = 0;
                     }
 
                 }
@@ -300,14 +382,33 @@ public class Player1 : MonoBehaviour {
                     jumpcd = jumpmaxcd;
                     jumps--;
                     land = false;
+                    dashtimer = 0;
                 } else
                 if (UnityEngine.Input.GetKey(KeyCode.A)) {
                     facingr1 = false;
-                    p1.AddForce(-transform.right * runspd);
+                    if (p1.velocity.x > -runspd && !(lrunoffstall && lrunofftimer > 0))
+                    {
+                        p1.AddForce(-transform.right * runaccel);
+                    }
+
+                    if (lrunofftimer == 0 && lrunoffstall == true)
+                    {
+                        runoff = true;
+                        landOrRegrabtimer = maxLandRegrab;
+                    }
                 }
                 else if (UnityEngine.Input.GetKey(KeyCode.D)) {
                     facingr1 = true;
-                    p1.AddForce(transform.right * runspd);
+                    if (p1.velocity.x < runspd && !(rrunoffstall && lrunofftimer > 0))
+                    {
+                        p1.AddForce(transform.right * runaccel);
+                    }
+
+                    if (lrunofftimer == 0 && rrunoffstall == true)
+                    {
+                        runoff = true;
+                        landOrRegrabtimer = maxLandRegrab;
+                    }
                 } 
                 else
                 {
@@ -320,7 +421,8 @@ public class Player1 : MonoBehaviour {
                     jumps--;
                     land = false;
                     runoff = false;
-             
+                    dashtimer = 0;
+                    //impart maxrunspeed in direction we are facing
                 }
 
                 break;
@@ -358,12 +460,9 @@ public class Player1 : MonoBehaviour {
                     {
 
                         p1.velocity = new Vector3 (p1.velocity.x,0,0);
-                        p1.AddForce(transform.up * ajumphgt);
                     }
-                    else
-                    {
-                        p1.AddForce(transform.up * ajumphgt);    
-                    }
+                    p1.AddForce(transform.up * ajumphgt);    
+                    
                     jumps--;
                 }
                 if (UnityEngine.Input.GetKey(KeyCode.S))
@@ -383,8 +482,10 @@ public class Player1 : MonoBehaviour {
 
                 if (land)
                 {
+                    //Debug.Log("hi");
                     p1s = "walk";
                     jumps = maxjumps;
+                    land = false;
                 }
                 
                 break;
@@ -397,7 +498,7 @@ public class Player1 : MonoBehaviour {
                 if (lag >0)
                 {
                     lag--;
-                    if (Physics.Raycast(transform.position,-Vector3.up,out hit, .01f ))
+                    if (Physics.Raycast(transform.position,-Vector3.up,out hit, capsuleVOffset ))
                     {
                         if (hit.collider.tag == "stage")
                         {
@@ -446,7 +547,7 @@ public class Player1 : MonoBehaviour {
                             {
                                 p1s = "airborn";
 
-                                land = false;
+                                //land = false;
                                 runoff = false;
                                 dashtimer = 0;
                                 shieldtimer = 0;
@@ -485,6 +586,15 @@ public class Player1 : MonoBehaviour {
                         if (lag == 0)
                         {
                             p1s = "airborn";
+
+                            //land = false;
+                            runoff = false;
+                            dashtimer = 0;
+                            shieldtimer = 0;
+                            lag = 0;
+                            dtrtimer = 0;
+                            okcrawl = false;
+                            standuptimer = 0;
                         }
                     }
                 }
@@ -581,7 +691,7 @@ public class Player1 : MonoBehaviour {
                         {
 
                             p1s = "walk";
-                            land = false;
+                            //land = false;
                             runoff = false;
                             dashtimer = 0;
                             shieldtimer = 0;
@@ -677,7 +787,8 @@ public class Player1 : MonoBehaviour {
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.tag == "stage" ) {
+        if (col.gameObject.tag == "stage" && Physics.Raycast(transform.position, -Vector3.up, out hit, capsuleVOffset) && landOrRegrabtimer == 0) {
+            Debug.Log("hi");
             land = true;
         }
 
@@ -701,8 +812,9 @@ public class Player1 : MonoBehaviour {
     void OnTriggerEnter(Collider collider)
     {
         //Debug.Log(collider + "dildos");
-        if (collider.tag == "hitbox")
+        if (collider.tag == "hitbox" )
         {
+            
             currentHB = collider.GetComponent<hitbox>();
             if ( (currentHB.playerNum != thisPlayer) && currentHB.special =="" && isHit == false)
             {
@@ -716,6 +828,75 @@ public class Player1 : MonoBehaviour {
                 //Debug.Log("hst"+hitstuntimer, gameObject);
             }
             
+        }
+
+        if (collider.tag == "lrunoff") 
+        {
+            if (p1s == "walk" || p1s == "run" || p1s == "dash")
+            {
+                Debug.Log("enter");
+                lrunofftimer = maxrunofftimer;
+                p1.velocity = Vector3.zero;
+                lrunoffstall = true;
+                temptrans = collider.GetComponent<Transform>();
+                p1.transform.position = temptrans.position + Vector3.up * capsuleVOffset;
+            }
+        }
+
+        if (collider.tag == "rrunoff")
+        {
+            if (p1s == "walk" || p1s == "run" || p1s == "dash")
+            {
+                rrunofftimer = maxrunofftimer;
+                p1.velocity = Vector3.zero;
+                rrunoffstall = true;
+                temptrans = collider.GetComponent<Transform>();
+                p1.transform.position = temptrans.position+Vector3.up*capsuleVOffset;
+            }
+        }
+
+    }
+    /*
+    void onTriggerStay (Collider collider)
+    {
+        Debug.Log("stay");
+        if (collider.tag == "lrunoff")
+        {
+            Debug.Log("stay");
+            if (lrunofftimer > 0)
+            {
+                lrunofftimer--;
+                
+            }
+            
+        }
+        if (collider.tag == "rrunoff")
+        {
+            if (rrunofftimer > 0)
+            {
+                rrunofftimer--;
+            }
+        }
+
+    }
+    */
+    
+    void OnTriggerExit(Collider collider)
+    {
+        if (collider.tag == "lrunoff")
+        {
+            Debug.Log("exit");
+            //lrunofftimer = maxrunofftimer;
+            lrunofftimer = 0;
+            lrunoffstall = false;
+            runoff = false;
+        }
+        if (collider.tag == "rrunoff")
+        {
+            //rrunofftimer = maxrunofftimer;
+            rrunofftimer = 0;
+            rrunoffstall = false;
+            runoff = false;
         }
     }
 
