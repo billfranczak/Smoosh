@@ -20,9 +20,12 @@ public class Player1 : MonoBehaviour {
     public float crawlspd;
     public float runspd;
     public float dashl;
-    public float airspd;
+    //public float airspd;
+    public float airMaxSpeed;
+    public float airAccel;
     public float flty;
-    public float fallspd;
+    public float fallSpdMax;
+    public float fallAccel;
     public float roll;
     public float gjumphgt;
     public float ajumphgt;
@@ -77,10 +80,12 @@ public class Player1 : MonoBehaviour {
         runspd = 15;
         crawlspd = 8;
 
-        airspd = 5;
-        fallspd = 10;
-        gjumphgt = 350;
-        ajumphgt = 250;
+        airMaxSpeed = 3;
+        airAccel = 30;
+        fallSpdMax = 3;
+        fallAccel = 20;
+        gjumphgt = 250;
+        ajumphgt = 200;
         jumpmaxcd = 10;
         maxjumps = 2;
         jumps = 2;
@@ -332,22 +337,41 @@ public class Player1 : MonoBehaviour {
 
                 if (UnityEngine.Input.GetKey(KeyCode.A))
                 {
-                    p1.AddForce(-transform.right * airspd);
+                    //p1.AddForce(-transform.right * airspd);
+                    if (p1.velocity.x > -airMaxSpeed)
+                    {
+                        p1.AddForce(-transform.right * airAccel);
+                    }
                 }
 
                 if (UnityEngine.Input.GetKey(KeyCode.D))
                 {
-                    p1.AddForce(transform.right * airspd);
+                    if (p1.velocity.x < airMaxSpeed)
+                    {
+                        p1.AddForce(transform.right * walkaccel);
+                    }
                 }
 
                 if (UnityEngine.Input.GetKeyDown(KeyCode.W) && jumpcd==0 && jumps >0)
                 {
-                    p1.AddForce(transform.up * ajumphgt);
+                    if (p1.velocity.y < 0)
+                    {
+
+                        p1.velocity = new Vector3 (p1.velocity.x,0,0);
+                        p1.AddForce(transform.up * ajumphgt);
+                    }
+                    else
+                    {
+                        p1.AddForce(transform.up * ajumphgt);    
+                    }
                     jumps--;
                 }
                 if (UnityEngine.Input.GetKey(KeyCode.S))
                 {
-                    p1.AddForce(-transform.up * fallspd);
+                    if (p1.velocity.y > -fallSpdMax)
+                    {
+                        p1.AddForce(-transform.up * fallAccel);
+                    }
                 }
 
                 if (UnityEngine.Input.GetKeyDown(KeyCode.Space))
@@ -392,19 +416,29 @@ public class Player1 : MonoBehaviour {
                             }
                         } else
                         {
+                           
                             if (UnityEngine.Input.GetKey(KeyCode.A))
                             {
-                                p1.AddForce(-transform.right * airspd);
+                                if (p1.velocity.x > -airMaxSpeed)
+                                {
+                                    p1.AddForce(-transform.right * airAccel);
+                                };
                             }
 
                             if (UnityEngine.Input.GetKey(KeyCode.D))
                             {
-                                p1.AddForce(transform.right * airspd);
+                                if (p1.velocity.x < airMaxSpeed)
+                                {
+                                    p1.AddForce(transform.right * walkaccel);
+                                }
                             }
 
                             if (UnityEngine.Input.GetKey(KeyCode.S))
                             {
-                                p1.AddForce(-transform.up * fallspd);
+                                if (p1.velocity.y > -fallSpdMax)
+                                {
+                                    p1.AddForce(-transform.up * fallAccel);
+                                }
                             }
 
 
@@ -426,17 +460,26 @@ public class Player1 : MonoBehaviour {
                     {
                         if (UnityEngine.Input.GetKey(KeyCode.A))
                         {
-                            p1.AddForce(-transform.right * airspd);
+                            if (p1.velocity.x > -airMaxSpeed)
+                            {
+                                p1.AddForce(-transform.right * airAccel);
+                            }
                         }
 
                         if (UnityEngine.Input.GetKey(KeyCode.D))
                         {
-                            p1.AddForce(transform.right * airspd);
+                            if (p1.velocity.x < airMaxSpeed)
+                            {
+                                p1.AddForce(transform.right * walkaccel);
+                            }
                         }
 
                         if (UnityEngine.Input.GetKey(KeyCode.S))
                         {
-                            p1.AddForce(-transform.up * fallspd);
+                            if (p1.velocity.y > -fallSpdMax)
+                            {
+                                p1.AddForce(-transform.up * fallAccel);
+                            }
                         }
 
                         if (lag == 0)
@@ -507,23 +550,23 @@ public class Player1 : MonoBehaviour {
                     {
                         if (UnityEngine.Input.GetKey(KeyCode.A))
                         {
-                            p1.AddForce(-transform.right * airspd *3);
+                            //p1.AddForce(-transform.right * airspd *3);
                         }
 
                         if (UnityEngine.Input.GetKey(KeyCode.D))
                         {
-                            p1.AddForce(transform.right * airspd *3);
+                           // p1.AddForce(transform.right * airspd *3);
                         }
                     } else
                     {
                         if (UnityEngine.Input.GetKey(KeyCode.A))
                         {
-                            p1.AddForce(-transform.right * airspd * .1f);
+                           // p1.AddForce(-transform.right * airspd * .1f);
                         }
 
                         if (UnityEngine.Input.GetKey(KeyCode.D))
                         {
-                            p1.AddForce(transform.right * airspd * .1f);
+                            //p1.AddForce(transform.right * airspd * .1f);
                         }
                     }
 
