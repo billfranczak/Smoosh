@@ -9,14 +9,14 @@ public class facing : MonoBehaviour {
     public bool facingr;
     public GameObject player1;
     public Transform pos;
-    Player1 p1;
+    ChallengerCon p1;
 
     // Use this for initialization
     void Start () {
         facingr = true;
         pos = GetComponent<Transform>();
 
-        p1 = player1.GetComponent<Player1>();
+        p1 = player1.GetComponent<ChallengerCon>();
         facingr = p1.facingr1;
     }
 	
