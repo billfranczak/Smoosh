@@ -33,20 +33,26 @@ public class ChallengerCon : MonoBehaviour {
     public float roll;
 
     //input
-    private bool jumpPressed; 
+    //private bool jumpPressed; 
 
-    public bool isJumping;
+   // public bool isJumping;
 
-    public float gjumphgt;
+    public float gSHjumphgt;
+    public float gFHjumphgt;
     public float ajumphgt;
-    public int jumpTime;
+    //public int jumpTime;
+    public int hoptimer;
+    public int maxhoptimer;
+    public int squattimer;
+    public int maxsquattimer;
     public int jumps;
     public int maxjumps;
     public int jumpcd;
     public int jumpmaxcd;
     public int jumpSquatFrames;
-    public int JumpFullFrames; //frames after short hop frames for full jump
-    public int jumpShortHopFrames;
+    //public int JumpFullFrames; //frames after short hop frames for full jump
+    //public int jumpShortHopFrames;
+    public bool fullhop;
 
 
 
@@ -65,6 +71,23 @@ public class ChallengerCon : MonoBehaviour {
     public int maxshield;
     public int shieldstun;
 
+
+    public bool intangible;
+    public float rollLength;
+    public int rollTime;
+    public int rollStart;
+    public int rolltimer;
+    public int rollIntStart;
+    public int rollIntEnd;
+    public int rollDir;
+
+    public int dodgeTime;
+    public int dodgeStart;
+    public int dodgetimer;
+    public int dodgeIntStart;
+    public int dodgeIntEnd;
+
+
     public bool land;
     public int oneframe; 
     public bool runoff;
@@ -74,6 +97,11 @@ public class ChallengerCon : MonoBehaviour {
     public int hitstun;
     public int hitstuntimer;
     public int dmg;
+
+    public bool isDead;
+    public int respawnTime;
+    public int respawntimer;
+    public int placePlayer;
 
     public int lrunofftimer;
     public int rrunofftimer;
@@ -108,20 +136,21 @@ public class ChallengerCon : MonoBehaviour {
         crawlspd = 8;
 
         airMaxSpeed = 3;
-        airAccel = 30;
+        airAccel = 20;
         fallSpdMax = 3;
         fallAccel = 20;
-        jumpTime = 0;
-        gjumphgt = 550;
+        gFHjumphgt = 350;
+        gSHjumphgt = 250;
         ajumphgt = 350;
-        jumpmaxcd = 10;
+        jumpmaxcd = 1;
         maxjumps = 2;
         jumps = 2;
-        jumpSquatFrames = 6; //4-7 frames
-        jumpShortHopFrames = 20;
-        JumpFullFrames = 20;
+        maxsquattimer = 6;
+        maxhoptimer = 5; //cannot be more than maxsquattimer
+        hoptimer = 0;
+        squattimer = 0; 
 
-        dashwindow = 7;
+        dashwindow = 10;
         dashtimer=0;
         dashl = 350;
         dashToRun = 7;
@@ -147,6 +176,9 @@ public class ChallengerCon : MonoBehaviour {
         hitstun = 0;
         hitstuntimer = 0;
 
+        isDead = false;
+        placePlayer = 40;
+        respawnTime = 80;
 
         maxrunofftimer = 5;
         //lrunofftimer = maxrunofftimer;
@@ -157,6 +189,18 @@ public class ChallengerCon : MonoBehaviour {
         rrunoffstall = false;
         landOrRegrabtimer = 0;
         maxLandRegrab = 10;
+
+
+        intangible = false;
+        dodgeTime = 30;
+        dodgeIntStart = 7;
+        dodgeIntEnd = 22;
+
+        rollTime = 40;
+        rollLength = 200;
+        rollStart = 7;
+        rollIntStart = 7;
+        rollIntEnd = 30;
 
         capsuleVOffset = .31f;
     }
@@ -183,22 +227,17 @@ public class ChallengerCon : MonoBehaviour {
         {
             p1s = "hitstun";
         }
-        //WORKING
-        if (UnityEngine.Input.GetKeyDown(KeyCode.W) && jumps > 0)
+
+        if (isDead)
         {
-            jumpPressed = true; //this is defirent than what an isAirborne would look like, this simply says we are attemtping a jump
-                              //this will require multiple checks to turn it off all around the code, but it allows us to say jump has been pressed and we 
-                              //are still jumping regardless of what the W key is curently doing, wich is an important part of short hop, as it takes place
-                              //across multiple states
-          
-        }                                               //might be redundant
-        if (UnityEngine.Input.GetKeyUp(KeyCode.W)) {
-            jumpPressed = false;
+            p1s = "dead";
         }
 
 
             //for some reason, capsule is not triggering "onTriggerStay". This is a temp solution
             //Ian to bill - what is the capsul trying to trigger on trigger stay on?
+
+            //Bill to Ian - capsule should register 'stay' in the runoff zone when standing on the edge, the commented out version below looks a lot like this.
             if (Physics.Raycast(transform.position, Vector3.down, out hit, capsuleVOffset) ) {
             if (hit.collider.tag == "lrunoff" && (p1s=="walk" || p1s == "run" || p1s == "dash" ))
             {
@@ -223,6 +262,8 @@ public class ChallengerCon : MonoBehaviour {
             landOrRegrabtimer--;
         }
        
+
+        //begin state processing:
 
         switch (p1s)
         {
@@ -258,11 +299,12 @@ public class ChallengerCon : MonoBehaviour {
                 }
 
                 //input
-                if (UnityEngine.Input.GetKey(KeyCode.A))
+                if (UnityEngine.Input.GetKey(KeyCode.A) && !(UnityEngine.Input.GetKey(KeyCode.F)) )
                 {
                     facingr1 = false;
-                    if (dashtimer > 0)
+                    if (dashtimer > 0 && UnityEngine.Input.GetKeyDown(KeyCode.A))
                     {
+                        p1.velocity = Vector3.zero;
                         p1s = "dash";
                         p1.AddForce(-transform.right * dashl);
                         dtrtimer = dashToRun;
@@ -281,10 +323,11 @@ public class ChallengerCon : MonoBehaviour {
                     }
                 }
 
-                if (UnityEngine.Input.GetKey(KeyCode.D))
+                if (UnityEngine.Input.GetKey(KeyCode.D) && !(UnityEngine.Input.GetKey(KeyCode.F)) )
                 {
                     facingr1 = true;
-                    if (dashtimer > 0) {
+                    if (dashtimer > 0 && UnityEngine.Input.GetKeyDown(KeyCode.D)) {
+                        p1.velocity = Vector3.zero;
                         p1s = "dash";
                         p1.AddForce(transform.right * dashl);
                         dtrtimer = dashToRun;
@@ -304,38 +347,29 @@ public class ChallengerCon : MonoBehaviour {
                     }
                 }
 
-                if (jumpPressed && jumps >0) 
-                {
 
-                    //WORKING
-                    p1.AddForce(transform.up * (gjumphgt / (jumpShortHopFrames + JumpFullFrames)));
-                    // p1.AddForce(transform.up * gjumphgt); //this should just be our first jumpsquat addforce
-                    p1s = "airborn";// we should proly have this switch be entirely based on our raycast right?
-                    isJumping = true;
-                        jumpcd = jumpmaxcd;
-                        jumps--;
-                        land = false;
-                    
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.W) && jumps > 0)
+                {
+                    //p1.AddForce(transform.up * gjumphgt);
+                    p1s = "jumpsquat";
+                    jumpcd = jumpmaxcd;
+                    jumps--;
+                    land = false;
+                    squattimer = maxsquattimer;
+                    hoptimer = maxhoptimer;
                     //Debug.Log("walk jump");
                 }
+
+                //crouch to dash
 
                 if (UnityEngine.Input.GetKeyDown(KeyCode.S))
                 {
                     dashtimer = dashwindow;
                 }
 
-                //doubletap dash
-                /*
-                if (UnityEngine.Input.GetKeyDown(KeyCode.D))
-                {
-                    dashtimer = dashwindow;
-                }
 
-                if (UnityEngine.Input.GetKeyDown(KeyCode.A))
-                {
-                    dashtimer = dashwindow;
-                }
-                */
+                
                 
                 if (UnityEngine.Input.GetKey(KeyCode.S) && dashtimer == 0)
                 {
@@ -343,7 +377,7 @@ public class ChallengerCon : MonoBehaviour {
                     p1s = "crawl";
                 } 
 
-                if (UnityEngine.Input.GetKey(KeyCode.F) && shieldhealth >0)
+                if (UnityEngine.Input.GetKey(KeyCode.F) && (UnityEngine.Input.GetMouseButton(0)) && shieldhealth >0)
                 {
                     p1s = "shield";
                     dashtimer = 0;
@@ -361,7 +395,7 @@ public class ChallengerCon : MonoBehaviour {
                     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
                 }
 
-                if (UnityEngine.Input.GetMouseButtonDown(1))
+                if (UnityEngine.Input.GetMouseButtonDown(1) && !(UnityEngine.Input.GetKey(KeyCode.F)) )
                 {
                     p1s = "attacking";
                     lag = 10;
@@ -372,6 +406,48 @@ public class ChallengerCon : MonoBehaviour {
                     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
                 }
 
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.A) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    rolltimer = 0;
+                    rollDir = -1;
+                    p1s = "roll";
+                }
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.D) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    rolltimer = 0;
+                    rollDir = 1;
+                    p1s = "roll";
+                }
+
+                if (UnityEngine.Input.GetKey(KeyCode.S) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    dodgetimer = 0;
+                    p1s = "dodge";
+                }
+
+                //alternate input
+                if (UnityEngine.Input.GetMouseButton(1) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    dodgetimer = 0;
+                    p1s = "dodge";
+                }
+
+
+
+
+                //doubletap dash
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.D) && dashtimer == 0)
+                {
+                    dashtimer = dashwindow;
+                }
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.A) && dashtimer == 0)
+                {
+                    dashtimer = dashwindow;
+                }
 
                 break;
 
@@ -415,14 +491,14 @@ public class ChallengerCon : MonoBehaviour {
 
                 if (UnityEngine.Input.GetKeyDown(KeyCode.W) && jumps > 0)
                 {
-                    p1.AddForce(transform.up * gjumphgt);
-                    p1s = "airborn";
+                    p1s = "jumpsquat";
                     jumpcd = jumpmaxcd;
                     jumps--;
                     land = false;
-                    dashtimer = 0;
+                    squattimer = maxsquattimer;
+                    hoptimer = maxhoptimer;
                 } else
-                if (UnityEngine.Input.GetKey(KeyCode.A)) {
+                if (UnityEngine.Input.GetKey(KeyCode.A) && !(UnityEngine.Input.GetKey(KeyCode.F)) ) {
                     facingr1 = false;
                     if (p1.velocity.x > -runspd && !(lrunoffstall && lrunofftimer > 0))
                     {
@@ -435,7 +511,7 @@ public class ChallengerCon : MonoBehaviour {
                         landOrRegrabtimer = maxLandRegrab;
                     }
                 }
-                else if (UnityEngine.Input.GetKey(KeyCode.D)) {
+                else if (UnityEngine.Input.GetKey(KeyCode.D) && !(UnityEngine.Input.GetKey(KeyCode.F)) ) {
                     facingr1 = true;
                     if (p1.velocity.x < runspd && !(rrunoffstall && lrunofftimer > 0))
                     {
@@ -463,8 +539,75 @@ public class ChallengerCon : MonoBehaviour {
                     //impart maxrunspeed in direction we are facing
                 }
 
+                if (UnityEngine.Input.GetKeyDown(KeyCode.A) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    rolltimer = 0;
+                    rollDir = -1;
+                    p1s = "roll";
+                }
+
+                if (UnityEngine.Input.GetKeyDown(KeyCode.D) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    rolltimer = 0;
+                    rollDir = 1;
+                    p1s = "roll";
+                }
+
+                if (UnityEngine.Input.GetKey(KeyCode.S) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    dodgetimer = 0;
+                    p1s = "dodge";
+                }
+
+                //alternate input
+                if (UnityEngine.Input.GetMouseButton(1) && UnityEngine.Input.GetKey(KeyCode.F))
+                {
+                    dodgetimer = 0;
+                    p1s = "dodge";
+                }
+
                 break;
 
+
+            case "jumpsquat":
+
+            
+                p1rend.material.color = Color.magenta;
+
+                if (hoptimer > 0)
+                {
+                    hoptimer--;
+                    if (hoptimer==0)
+                    {
+                        if (UnityEngine.Input.GetKey(KeyCode.W))
+                        {
+                            fullhop = true;
+                        } else
+                        {
+                            fullhop = false;
+                        }
+                    }
+                }
+                if (squattimer > 0)
+                {
+                    squattimer--;
+                    if (squattimer == 0)
+                    {
+                        if (fullhop)
+                        {
+                            p1.AddForce(transform.up * gFHjumphgt);
+                        } else
+                        {
+                            p1.AddForce(transform.up * gSHjumphgt);
+                        }
+                        p1s = "airborn";
+                    }
+                }
+
+
+                   
+
+                break;  
 
 
             case "airborn":
@@ -492,51 +635,10 @@ public class ChallengerCon : MonoBehaviour {
                     }
                 }
 
-                //Working
 
-                //if (isJumping && jumps == 1)wasJumping = true; 
-                //if w are jumping and this is our first jump
-                if (isJumping)
+                if (UnityEngine.Input.GetKeyDown(KeyCode.W) && jumpcd==0 && jumps >0 && !(land))
                 {
-                    if (jumpTime <= jumpShortHopFrames && jumpPressed) //if we still have shorthop frames to spend
-                    {
-
-                        jumpTime++; //one total jump frame is spent
-                        Debug.Log("Shorthop" + jumpTime);
-                        p1.AddForce(transform.up * (gjumphgt / (jumpShortHopFrames + JumpFullFrames))); //add one frames worth of force
-                        //if (!wasJumping) wasJumping = true; //we have now initated our jump
-                    }
-                    else if (isJumping && jumpTime <= (jumpShortHopFrames + JumpFullFrames) && jumpTime >= jumpShortHopFrames)
-                    {
-                        jumpTime++;
-                        Debug.Log("fullhop" + jumpTime);
-                        
-                        p1.AddForce(transform.up * (gjumphgt / (jumpShortHopFrames + JumpFullFrames)));
-                    }
-                    else
-                    {
-                        //jumps--;
-                        Debug.Log("Jump Done");
-                        jumpTime = 0;
-                        isJumping = false;
-
-                    }
-                }
-
-
-
-
-
-
-
-                //double jump can stay as is
-                if (UnityEngine.Input.GetKeyDown(KeyCode.W) && jumpcd==0 && jumps >0)
-                {
-                    if (p1.velocity.y < 0)
-                    {
-
-                        p1.velocity = new Vector3 (p1.velocity.x,0,0);
-                    }
+                    p1.velocity = new Vector3 (p1.velocity.x,0,0);
                     p1.AddForce(transform.up * ajumphgt);    
                     
                     jumps--;
@@ -559,7 +661,14 @@ public class ChallengerCon : MonoBehaviour {
                 if (land)
                 {
                     //Debug.Log("hi");
-                    p1s = "walk";
+                    if (p1.velocity.x > walkspd)
+                    {
+                        p1s = "run";
+                    } else
+                    {
+                        p1s = "walk";
+                    }
+
                     jumps = maxjumps;
                     land = false;
                 }
@@ -699,7 +808,7 @@ public class ChallengerCon : MonoBehaviour {
                     }
                 }
 
-                if (UnityEngine.Input.GetKey(KeyCode.F) == false)
+                if (!(UnityEngine.Input.GetKey(KeyCode.F)) || !(UnityEngine.Input.GetMouseButton(0)))
                 {
                     inshield = false;
                 }
@@ -711,9 +820,70 @@ public class ChallengerCon : MonoBehaviour {
                 }
 
 
+
                 break;
 
+            case "roll":
+                p1rend.material.color = Color.white;
+                if (rolltimer < rollTime)
+                {
+                    rolltimer++;
+                    if (rolltimer == 1)
+                    {
+                        p1.velocity = Vector3.zero;
+                    }
+                    if (rolltimer == rollStart)
+                    {
+                        p1.AddForce(rollDir*transform.right * rollLength);
+                    }
+                    if (rolltimer == rollIntStart)
+                    {
+                        intangible = true;
+                    }
+                    if (rolltimer == rollIntEnd)
+                    {
+                        intangible = false;
 
+                        if (rollDir == 1)
+                        {
+                            facingr1 = false;
+                        } else
+                        {
+                            facingr1 = true;
+                        }
+                    }
+                } else
+                {
+                    p1s = "walk";
+                }
+
+
+                break;
+
+            case "dodge":
+                p1rend.material.color = Color.white;
+                if (dodgetimer < dodgeTime)
+                {
+                    dodgetimer++;
+                    if (dodgetimer == 1)
+                    {
+                        p1.velocity = Vector3.zero;
+                    }                   
+                    if (dodgetimer == dodgeIntStart)
+                    {
+                        intangible = true;
+                    }
+                    if (dodgetimer == dodgeIntEnd)
+                    {
+                        intangible = false;
+                    }
+                }
+                else
+                {
+                    p1s = "walk";
+                }
+
+                break;
 
             case "hitstun":
                 p1rend.material.color = Color.red;
@@ -736,23 +906,23 @@ public class ChallengerCon : MonoBehaviour {
                     {
                         if (UnityEngine.Input.GetKey(KeyCode.A))
                         {
-                            //p1.AddForce(-transform.right * airspd *3);
+                            p1.AddForce(-transform.right * airAccel *3);
                         }
 
                         if (UnityEngine.Input.GetKey(KeyCode.D))
                         {
-                           // p1.AddForce(transform.right * airspd *3);
+                           p1.AddForce(transform.right * airAccel *3);
                         }
                     } else
                     {
                         if (UnityEngine.Input.GetKey(KeyCode.A))
                         {
-                           // p1.AddForce(-transform.right * airspd * .1f);
+                           p1.AddForce(-transform.right * airAccel * .1f);
                         }
 
                         if (UnityEngine.Input.GetKey(KeyCode.D))
                         {
-                            //p1.AddForce(transform.right * airspd * .1f);
+                            p1.AddForce(transform.right * airAccel * .1f);
                         }
                     }
 
@@ -821,7 +991,32 @@ public class ChallengerCon : MonoBehaviour {
 
                 break;
 
+            case "dead":
+                p1rend.material.color = Color.black;
+                isDead = false;
+                p1.velocity = Vector3.zero;
+                if (respawntimer < placePlayer) 
+                {
+                    p1.position = Vector3.zero;
+                }
+                if (respawntimer > 0)
+                {
+                    respawntimer--;
+                } else
+                {
+                    p1s = "airborn";
+                    jumps = maxjumps - 1;
+                    land = false;
+                    runoff = false;
+                    dashtimer = 0;
+                    shieldtimer = 0;
+                    lag = 0;
+                    dtrtimer = 0;
+                    okcrawl = false;
+                    standuptimer = 0;
 
+                }
+                break;
 
             case "ledge":
                 p1rend.material.color = Color.black;
@@ -864,7 +1059,7 @@ public class ChallengerCon : MonoBehaviour {
     void OnCollisionEnter(Collision col)
     {
         if (col.gameObject.tag == "stage" && Physics.Raycast(transform.position, -Vector3.up, out hit, capsuleVOffset) && landOrRegrabtimer == 0) {
-            Debug.Log("landed");
+            //Debug.Log("landed");
             land = true;
             //Working
 
@@ -894,7 +1089,7 @@ public class ChallengerCon : MonoBehaviour {
         {
             
             currentHB = collider.GetComponent<hitbox>();
-            if ( (currentHB.playerNum != thisPlayer) && currentHB.special =="" && isHit == false)
+            if ( (currentHB.playerNum != thisPlayer) && currentHB.special =="" && isHit == false && inshield == false && intangible == false)
             {
                 //Debug.Log("extra dildos");
                 p1rend.material.color = Color.magenta;
@@ -931,6 +1126,12 @@ public class ChallengerCon : MonoBehaviour {
                 temptrans = collider.GetComponent<Transform>();
                 p1.transform.position = temptrans.position+Vector3.up*capsuleVOffset;
             }
+        }
+
+        if (collider.tag == "blastline")
+        {
+            isDead = true;
+            respawntimer = respawnTime;
         }
 
     }
