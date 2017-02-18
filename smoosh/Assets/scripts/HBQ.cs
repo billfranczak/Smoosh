@@ -20,7 +20,7 @@ public class HBQ : MonoBehaviour {
             hbObjList.Add (GameObject.CreatePrimitive(PrimitiveType.Sphere));
             //add hitbox Component to that sphere and to our hitbox component list
             hbCompList.Add (hbObjList[i].AddComponent<hitbox>());
-            hbCompList[i].player1 = pcObj;
+            hbCompList[i].player = pcObj;
             hbCompList[i].queue = gameObject;
             hbObjList[i].GetComponent<SphereCollider>().isTrigger = true;
             hbObjList[i].tag = "hitbox";

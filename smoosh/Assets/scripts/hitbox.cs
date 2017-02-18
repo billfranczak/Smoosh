@@ -5,9 +5,9 @@ using UnityEngine;
 public class hitbox : MonoBehaviour {
 
 
-    public GameObject player1;
+    public GameObject player;
     public GameObject queue;
-    Player1 p1;
+    ChallengerCon p;
     HBQ q;
     public Transform pos;
     public Renderer hbrend;
@@ -34,6 +34,7 @@ public class hitbox : MonoBehaviour {
     public int priority;  //The raiting at wich a move will overide another simulataneously cast and overlapping move
     public float bkb; //base knockback
     public float skb; //scaling knockback
+    public int atkDir;
 
     public bool clanked; //tells if another move clanked the current hitbox 
 
@@ -52,7 +53,7 @@ public class hitbox : MonoBehaviour {
         active = false;
         duration = 0;
         pos = GetComponent<Transform>();
-        p1 = player1.GetComponent<Player1>();
+        p = player.GetComponent<ChallengerCon>();
         q = queue.GetComponent<HBQ>();
         size = 0.3f;
 
@@ -65,7 +66,7 @@ public class hitbox : MonoBehaviour {
 
         if (duration > 0)
         {
-            p1 = player1.GetComponent<Player1>(); //refactor potential
+            p = player.GetComponent<ChallengerCon>(); //refactor potential
             duration--;
             //Debug.Log("Yo it's in!", gameObject);
             if (activeOn > 0) {
@@ -73,7 +74,7 @@ public class hitbox : MonoBehaviour {
                 if (activeOn == 0)
                 {
                     active = true;
-                    pos.position = player1.transform.position + location;
+                    pos.position = player.transform.position + location;
                     hbrend.material.color = Color.red;
                 }
             }
@@ -82,7 +83,7 @@ public class hitbox : MonoBehaviour {
             pos.transform.localScale = new Vector3(size, size, size);
             if (tethered)
             {
-                pos.position = player1.transform.position + location;
+                pos.position = player.transform.position + location;
 
             } else
             {
