@@ -7,8 +7,7 @@ public class hitbox : MonoBehaviour {
 
     public GameObject player;
     public GameObject queue;
-    ChallengerCon p;
-    HBQ q;
+    public ChallengerCon p;
     public Transform pos;
     public Renderer hbrend;
 
@@ -40,7 +39,7 @@ public class hitbox : MonoBehaviour {
 
     public string special; //used for weird moves, hitbox listens for updates to this
 
-
+    public int offset; //offsets hitboxes in space
 
     //pass-on traits - spawn a new hitbox when the current one finishes
 
@@ -53,8 +52,6 @@ public class hitbox : MonoBehaviour {
         active = false;
         duration = 0;
         pos = GetComponent<Transform>();
-        p = player.GetComponent<ChallengerCon>();
-        q = queue.GetComponent<HBQ>();
         size = 0.3f;
 
         hbrend.material.color = Color.yellow;
@@ -66,7 +63,6 @@ public class hitbox : MonoBehaviour {
 
         if (duration > 0)
         {
-            p = player.GetComponent<ChallengerCon>(); //refactor potential
             duration--;
             //Debug.Log("Yo it's in!", gameObject);
             if (activeOn > 0) {
@@ -74,7 +70,7 @@ public class hitbox : MonoBehaviour {
                 if (activeOn == 0)
                 {
                     active = true;
-                    pos.position = player.transform.position + location;
+                    pos.position = p.transform.position + location;
                     hbrend.material.color = Color.red;
                 }
             }
@@ -83,7 +79,7 @@ public class hitbox : MonoBehaviour {
             pos.transform.localScale = new Vector3(size, size, size);
             if (tethered)
             {
-                pos.position = player.transform.position + location;
+                pos.position = p.transform.position + location;
 
             } else
             {
@@ -92,13 +88,12 @@ public class hitbox : MonoBehaviour {
 
             //return to offscreen position
             if (duration==0 || clanked) {
-                pos.position = new Vector3(-10, 5, 3);
+                pos.position = new Vector3(-10, 5+5*offset, 3);
                 hbrend.material.color = Color.yellow;
                 clanked = false;
                 active = false;
-                //push into q
-                q = queue.GetComponent<HBQ>(); //refactor potential
-                q.EnQ(this);
+                //push into p's queue
+                p.EnQ(this);
             }
             
         } 

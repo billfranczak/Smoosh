@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//DEPROCATED???
 public class HBQ : MonoBehaviour {
 
     public int hbNum;
@@ -9,6 +10,11 @@ public class HBQ : MonoBehaviour {
     public List<GameObject> hbObjList;
     public List<hitbox> hbCompList;
     hitbox currentHB;
+
+    public HBQ(int hitboxNumberMax)
+    {
+        hbNum = hitboxNumberMax;
+    }
 
     // Hitbox Manager/Controller keeps a list of hitboxes
     void Start()
