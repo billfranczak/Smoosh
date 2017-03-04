@@ -12,6 +12,7 @@ public class BlankBox : MonoBehaviour {
     public BlankBox (ChallengerCon chal)
     {
         player = chal;
+        act = blank;
     }
 
 	// Use this for initialization

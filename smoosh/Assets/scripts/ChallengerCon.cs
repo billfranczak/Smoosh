@@ -25,6 +25,7 @@ public class ChallengerCon : MonoBehaviour
     public Action<int> fStrong;
     public Action<int> uStrong;
     public Action<int> dStrong;
+    public Action<int> nSpecial;
     public Action<int> fSpecial;
     public Action<int> uSpecial;
     public Action<int> dSpecial;
@@ -162,6 +163,12 @@ public class ChallengerCon : MonoBehaviour
     public int dodgeIntStart;
     public int dodgeIntEnd;
 
+    public int airDodgeTime;
+    public int airDodgeStart;
+    public int airDodgeTimer;
+    public int airDodgeIntStart;
+    public int airDodgeIntEnd;
+
 
     public bool land;
     public int oneframe;
@@ -222,6 +229,7 @@ public class ChallengerCon : MonoBehaviour
     public bool rollInput;
     public bool jabInput;
     public bool grabInput;
+    public bool nSpecInput;
     public bool fSpecInput;
     public bool dSpecInput;
     public bool uSpecInput;
@@ -248,6 +256,7 @@ public class ChallengerCon : MonoBehaviour
     */
     public bool attack;
     public bool special;
+    public bool attackBehind;
 
     public float mouseX;
     public float mouseY;
@@ -408,6 +417,11 @@ public class ChallengerCon : MonoBehaviour
         dodgeIntStart = frameData.dodgeIntStart;
         dodgeIntEnd = frameData.dodgeIntEnd;
 
+        //airdodge
+        airDodgeTime = frameData.airDodgeTime;
+        airDodgeIntStart = frameData.airDodgeIntStart;
+        airDodgeIntEnd = frameData.airDodgeIntEnd;
+
         //roll
         rollTime = frameData.rollTime;
         rollLength = frameData.rollLength;
@@ -438,6 +452,7 @@ public class ChallengerCon : MonoBehaviour
         fStrong = moveList.fstrong;
         uStrong = moveList.ustrong;
         dStrong = moveList.dstrong;
+        nSpecial = moveList.nspec;
         fSpecial = moveList.fspec;
         uSpecial = moveList.uspec;
         dSpecial = moveList.dspec;
@@ -534,6 +549,35 @@ public class ChallengerCon : MonoBehaviour
         if (attack)
         {
             special = false;
+            dodgeInput = false;
+            rollInput = false;
+            if (mouseX >= screenPos.x )
+            {
+                mouseRight = true;
+            }
+            else
+            {
+                mouseRight = false;
+            }
+
+            if (UnityEngine.Input.GetKey(left) || UnityEngine.Input.GetKey(left))
+            {
+                fAttackInput = true;
+            }
+            else if (UnityEngine.Input.GetKey(jump) )
+            {
+                uAttackInput = true;
+            }
+            else if (UnityEngine.Input.GetKey(down) )
+            {
+                dAttackInput = true;
+            }
+            else
+            {
+                jabInput = true;
+            }
+
+            /*
             //right quad
             if (mouseY >-(mouseX-screenPos.x)+ screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
             {
@@ -555,11 +599,42 @@ public class ChallengerCon : MonoBehaviour
             {
                 fAttackInput = true;
             }
-
+            */
         }
 
         if (special)
         {
+            dodgeInput = false;
+            rollInput = false;
+
+            if (mouseX >= screenPos.x)
+            {
+                mouseRight = true;
+            }
+            else
+            {
+                mouseRight = false;
+            }
+
+            if (UnityEngine.Input.GetKey(left) || UnityEngine.Input.GetKey(left))
+            {
+                fSpecInput = true;
+            }
+            else if (UnityEngine.Input.GetKey(jump))
+            {
+                uSpecInput = true;
+            }
+            else if (UnityEngine.Input.GetKey(down))
+            {
+                dSpecInput = true;
+            }
+            else
+            {
+                nSpecInput = true;
+            }
+
+
+            /*
             //right quad
             if (mouseY > -(mouseX - screenPos.x) + screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
             {
@@ -584,6 +659,7 @@ public class ChallengerCon : MonoBehaviour
                 fSpecInput = true;
                // Debug.Log("lspec" + mouseX + " " + mouseY + "pos " + screenPos.x + "," + screenPos.y);
             }
+            */
         }
 
 
@@ -1117,6 +1193,7 @@ public class ChallengerCon : MonoBehaviour
                     jumps--;
                     //Debug.Log("DJ");
                 }
+
                 if (downInput)
                 {
                     if (p1.velocity.y > -fallSpdMax)
@@ -1179,7 +1256,11 @@ public class ChallengerCon : MonoBehaviour
                     //Debug.Log("dspec");
                 }
 
-
+                if (dodgeInput)
+                {
+                    state = "airdodge";
+                    airDodgeTimer = 0;
+                }
 
                 if (land)
                 {
@@ -1409,6 +1490,91 @@ public class ChallengerCon : MonoBehaviour
                 else
                 {
                     state = "walk";
+                }
+
+                break;
+
+            case "airdodge":
+                p1rend.material.color = Color.white;
+                if (airDodgeTimer < airDodgeTime)
+                {
+                    airDodgeTimer++;
+                    if (airDodgeTimer == airDodgeIntStart)
+                    {
+                        intangible = true;
+                    }
+                    if (airDodgeTimer == airDodgeIntEnd)
+                    {
+                        intangible = false;
+                    }
+
+                    if (leftInput)
+                    {
+                        if (p1.velocity.x > -airMaxSpeed)
+                        {
+                            p1.AddForce(-transform.right * airAccel);
+                        }
+                    }
+
+                    if (rightInput)
+                    {
+                        if (p1.velocity.x < airMaxSpeed)
+                        {
+                            p1.AddForce(transform.right * walkAccel);
+                        }
+                    }
+
+                }
+                else
+                {
+                    //Debug.Log("airdodge exit strat");
+                    if (Physics.Raycast(transform.position, -Vector3.up, out hit, .01f))
+                    {
+                        if (hit.collider.tag == "stage")
+                        {
+                            Debug.Log("airdodge - walk");
+                            state = "walk";
+                            //land = false;
+                            runoff = false;
+                            dashTimer = 0;
+                            shieldTimer = 0;
+                            lag = 0;
+                            dtrtimer = 0;
+                            okCrawl = false;
+                            standupTimer = 0;
+
+                            jumps = jumpsMax;
+
+                        }
+                        else
+                        {
+                            // Debug.Log("out of airdodge 1", gameObject);
+                            Debug.Log("airdodge - air");
+                            state = "airborn";
+                            land = false;
+                            runoff = false;
+                            dashTimer = 0;
+                            shieldTimer = 0;
+                            lag = 0;
+                            dtrtimer = 0;
+                            okCrawl = false;
+                            standupTimer = 0;
+                        }
+                    }
+                    else
+                    {
+                        // Debug.Log("out of airdodge 1", gameObject);
+                        Debug.Log("airdodge - air");
+                        state = "airborn";
+                        land = false;
+                        runoff = false;
+                        dashTimer = 0;
+                        shieldTimer = 0;
+                        lag = 0;
+                        dtrtimer = 0;
+                        okCrawl = false;
+                        standupTimer = 0;
+                    }
                 }
 
                 break;
@@ -1777,6 +1943,7 @@ public class ChallengerCon : MonoBehaviour
             attack = false;
             special = false;
             mouseRight = false;
+            attackBehind = false;
         }
         if( facingr1)
         {

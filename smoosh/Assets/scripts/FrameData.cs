@@ -42,6 +42,11 @@ public class FrameData : ScriptableObject
     public int dodgeIntStart;
     public int dodgeIntEnd;
 
+    //airdodge
+    public int airDodgeTime;
+    public int airDodgeIntStart;
+    public int airDodgeIntEnd;
+
     //roll
     public int rollTime;
     public float rollLength;
@@ -109,6 +114,11 @@ public class FrameData : ScriptableObject
                 dodgeTime = 30;
                 dodgeIntStart = 7;
                 dodgeIntEnd = 22;
+
+                //dodge
+                airDodgeTime = 30;
+                airDodgeIntStart = 7;
+                airDodgeIntEnd = 22;
 
                 //roll
                 rollTime = 30;

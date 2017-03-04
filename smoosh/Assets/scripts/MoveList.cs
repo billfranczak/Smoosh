@@ -16,6 +16,7 @@ public class MoveList : ScriptableObject
     public Action<int> fstrong;
     public Action<int> ustrong;
     public Action<int> dstrong;
+    public Action<int> nspec;
     public Action<int> fspec;
     public Action<int> uspec;
     public Action<int> dspec;
@@ -110,6 +111,11 @@ public class MoveList : ScriptableObject
         blank();
     }
     public void TMANdair(int na)
+    {
+        blank();
+    }
+
+    public void TMANnspec(int na)
     {
         blank();
     }
