@@ -68,6 +68,7 @@ public class FrameData : ScriptableObject
     //mis
     public int skidFrames;
     public int hbMax;
+    public int bbMax;
     
 
     
@@ -89,7 +90,7 @@ public class FrameData : ScriptableObject
                 airMaxSpeed = 3;
                 airAccel = 20;
                 fallSpdMax = 3;
-                fallAccel = 20;
+                fallAccel = 10;
                 fhJumpHeight = 350;
                 shJumpHeight = 250;
                 aJumpHeight = 350;
@@ -143,6 +144,7 @@ public class FrameData : ScriptableObject
 
                 //misc
                 hbMax = 10;
+                bbMax = 10;
 
                 break;
 

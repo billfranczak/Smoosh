@@ -27,6 +27,9 @@ public class MoveList : ScriptableObject
     public Action<int> dair;
     public Action<int> dash;
 
+    public Action<int> resUpdate;
+    public int numResources;
+
     public MoveList (ChallengerCon player, string character)
     {
 
@@ -49,9 +52,12 @@ public class MoveList : ScriptableObject
                 bair = TMANbair;
                 uair = TMANuair;
                 dair = TMANdair;
+                nspec = TMANnspec;
                 fspec = TMANfspec;
                 uspec = TMANuspec;
                 dspec = TMANdspec;
+                numResources = 2;
+                resUpdate = TMANresUpdate;
                
 
                 break;
@@ -117,7 +123,31 @@ public class MoveList : ScriptableObject
 
     public void TMANnspec(int na)
     {
-        blank();
+        if (p1.resource[1]>0)
+        {
+            p1.resource[1]--;
+            p1.state = "attacking";
+            p1.lag = 7;
+            p1.bbDeQ();
+            BlankBox bb = p1.currentBB;
+            bb.duration = 4;
+            bb.act= delegate (int n) 
+            {
+                bb.duration--;
+                if (bb.duration == 1)
+                {
+                    //
+                    p1.transform.position += Vector3.right*((p1.mouseX-p1.screenPos.x)/ (float) Math.Sqrt((p1.mouseX - p1.screenPos.x)* (p1.mouseX - p1.screenPos.x)+ (p1.mouseY - p1.screenPos.y) * (p1.mouseY - p1.screenPos.y)));
+                    p1.transform.position += Vector3.up * ((p1.mouseY - p1.screenPos.y) / (float)Math.Sqrt((p1.mouseX - p1.screenPos.x) * (p1.mouseX - p1.screenPos.x) + (p1.mouseY - p1.screenPos.y) * (p1.mouseY - p1.screenPos.y)));
+                }
+                if (bb.duration ==0)
+                {
+                    p1.bbEnQ(bb);
+                    bb.act = bb.blank;
+                }
+            };
+        }
+
     }
 
     public void TMANfspec(int na)
@@ -153,6 +183,28 @@ public class MoveList : ScriptableObject
     {
         blank();
     }
+
+    public void TMANresUpdate(int na)
+    {
+        //Debug.Log("update");
+        if (p1.resource[0]<120)
+        {
+            p1.resource[0]++;
+        }
+        else
+        {
+            if (p1.resource[1]<2)
+            {
+                p1.resource[1]++;
+                p1.resource[0] = 0;
+            }
+            else
+            {
+                p1.resource[0] = 0;
+            }
+        }
+    }
+
 
 
     public void blank() { }

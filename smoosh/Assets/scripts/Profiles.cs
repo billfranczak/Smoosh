@@ -44,7 +44,7 @@ public class Profiles : ScriptableObject{
     public Profiles() // erase after serializable is implemented
     {
         //bill
-        Debug.Log("Profiles loading?");
+        //Debug.Log("Profiles loading?");
         profileNames = new List<string>();
 
         shiftWalk = new List<bool>(); ;
@@ -111,7 +111,7 @@ public class Profiles : ScriptableObject{
         mod2button2.Add("");
         mod2lr.Add("");
         mod2down.Add("");
-        Debug.Log("Profiles loaded");
+        //Debug.Log("Profiles loaded");
     }
 
 

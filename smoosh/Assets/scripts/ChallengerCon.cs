@@ -35,6 +35,9 @@ public class ChallengerCon : MonoBehaviour
     public Action<int> uAir;
     public Action<int> dAir;
     public Action<int> dashAttack;
+
+    
+
     /*
     public GameObject hbqueue;
     public HBQ hbq;
@@ -53,7 +56,7 @@ public class ChallengerCon : MonoBehaviour
     public GameObject bObj;
     public List<GameObject> bbObjList;
     public List<BlankBox> bbCompList;
-    BlankBox currentBB;
+    public BlankBox currentBB;
 
 
     public bool shiftwalk;
@@ -87,6 +90,9 @@ public class ChallengerCon : MonoBehaviour
     public string mod2lr;
     public string mod2down;
 
+    public int[] resource;
+    public Action<int> resUpdate;
+    public int numResources;
 
 
     public Vector3 pos;
@@ -332,14 +338,24 @@ public class ChallengerCon : MonoBehaviour
 
 
         }
-        bbox = new BlankBox(this);
+
+
+        //bbox = new BlankBox(this);
+
+        bbMax = frameData.bbMax;
+
         //bbq
         for (int i=0; i<bbMax; i++)
         {
-            bbCompList.Add(Instantiate(bbox));
+            //bbCompList.Add(Instantiate(bbox));
+            bbObjList.Add(GameObject.CreatePrimitive(PrimitiveType.Sphere));
+            bbCompList.Add(bbObjList[i].AddComponent<BlankBox>());
+            bbCompList[i].player = this;
+            bbObjList[i].transform.position = new Vector3(-20, 5 + 5 * i, 3);
         }
 
         isHit = false;
+
 
         //walk
         walkAccel = frameData.walkAccel;
@@ -462,6 +478,17 @@ public class ChallengerCon : MonoBehaviour
         uAir = moveList.uair;
         dAir = moveList.dair;
         dashAttack = moveList.dash;
+
+        numResources = moveList.numResources;
+
+        resource = new int[numResources];
+        for (int n=0;n<numResources;n++)
+        {
+            resource[n] = 0;
+        }
+
+        resUpdate = moveList.resUpdate;
+
 
     }
 
@@ -717,6 +744,7 @@ public class ChallengerCon : MonoBehaviour
             state = "dead";
         }
 
+        resUpdate(0);
 
         //for some reason, capsule is not triggering "onTriggerStay". This is a temp solution
         //Ian to bill - what is the capsul trying to trigger on trigger stay on?
@@ -911,6 +939,10 @@ public class ChallengerCon : MonoBehaviour
                     dWeak(0);
                 }
 
+                if (nSpecInput)
+                {
+                    nSpecial(0);
+                }
                 if (fSpecInput)
                 {
                     fSpecial(0);
@@ -1118,6 +1150,16 @@ public class ChallengerCon : MonoBehaviour
                 
                 p1rend.material.color = Color.magenta;
 
+                if (uAttackInput)
+                {
+                    uWeak(0);
+                }
+
+                if (uSpecInput)
+                {
+                    uSpecial(0);
+                }
+
                 if (hopTimer > 0)
                 {
                     hopTimer--;
@@ -1242,6 +1284,10 @@ public class ChallengerCon : MonoBehaviour
                     dAir(0);
                 }
 
+                if (nSpecInput)
+                {
+                    nSpecial(0);
+                }
                 if (fSpecInput)
                 {
                     fSpecial(0);
@@ -1415,6 +1461,16 @@ public class ChallengerCon : MonoBehaviour
                     }
                 }
 
+                if (jumpInput && jumps > 0)
+                {
+                    state = "jumpsquat";
+                    jumpcd = jumpCdMax;
+                    jumps--;
+                    land = false;
+                    squatTimer = squatTimerMax;
+                    hopTimer = hopTimerMax;
+                }
+
                 if (shieldInput)
                 {
                     inShield = false;
@@ -1528,7 +1584,7 @@ public class ChallengerCon : MonoBehaviour
                 else
                 {
                     //Debug.Log("airdodge exit strat");
-                    if (Physics.Raycast(transform.position, -Vector3.up, out hit, .01f))
+                    if (Physics.Raycast(transform.position, -Vector3.up, out hit, capsuleVOffset))
                     {
                         if (hit.collider.tag == "stage")
                         {
@@ -1633,7 +1689,7 @@ public class ChallengerCon : MonoBehaviour
                 //return to an acting state !!!! needs a few safety checks!!!!
                 if (hitstunTimer == 0)
                 {
-                    if (Physics.Raycast(transform.position, -Vector3.up, out hit, .01f))
+                    if (Physics.Raycast(transform.position, -Vector3.up, out hit, capsuleVOffset))
                     {
                         if (hit.collider.tag == "stage")
                         {
@@ -1930,6 +1986,7 @@ public class ChallengerCon : MonoBehaviour
             rollInput = false;
             jabInput = false;
             grabInput = false;
+            nSpecInput = false;
             fSpecInput = false;
             dSpecInput = false;
             uSpecInput = false;
@@ -2160,11 +2217,11 @@ public class ChallengerCon : MonoBehaviour
     //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
 
-    public void bbDeQ (Action<int> a)
+    public void bbDeQ () //Action<int> a
     {
         currentBB = bbCompList[0];
         bbCompList.Remove(bbCompList[0]);
-        currentBB.act = a;
+        //currentBB.act = a;
     }
 
 
