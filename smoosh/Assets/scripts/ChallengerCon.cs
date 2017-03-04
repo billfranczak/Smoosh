@@ -270,6 +270,7 @@ public class ChallengerCon : MonoBehaviour
 
     public Vector3 screenPos;
 
+    PlayerController pc;
 
     // Use this for initialization
     void Start()
@@ -489,6 +490,7 @@ public class ChallengerCon : MonoBehaviour
 
         resUpdate = moveList.resUpdate;
 
+        pc = new PlayerController(this);
 
     }
 
@@ -497,234 +499,7 @@ public class ChallengerCon : MonoBehaviour
     {
         pos = transform.position;
 
-
-        //input buffer
-        attack = false;
-        special = false;
-
-        if (UnityEngine.Input.GetKey(button1Input))
-        {
-            inputSelect(button1Assign);
-        }
-        if (UnityEngine.Input.GetKey(button2Input))
-        {
-            inputSelect(button2Assign);
-        }
-        if (UnityEngine.Input.GetMouseButton(0))
-        {
-            inputSelect(mb1);
-        }
-        if (UnityEngine.Input.GetMouseButton(1))
-        {
-            inputSelect(mb2);
-        }
-
-        if (UnityEngine.Input.GetKey(modifier1) && UnityEngine.Input.GetKey(button1Input))
-        {
-            inputSelect(mod1button1);
-        }
-        if (UnityEngine.Input.GetKey(modifier1) && UnityEngine.Input.GetKey(button2Input))
-        {
-            inputSelect(mod1button2);
-        }
-        if (UnityEngine.Input.GetKey(modifier1) && UnityEngine.Input.GetMouseButton(0))
-        {
-            inputSelect(mod1mb1);
-        }
-        if (UnityEngine.Input.GetKey(modifier1) && UnityEngine.Input.GetMouseButton(1))
-        {
-            inputSelect(mod1mb2);
-        }
-        if (UnityEngine.Input.GetKey(modifier1) && (UnityEngine.Input.GetKey(left)|| UnityEngine.Input.GetKey(right)))
-        {
-            inputSelect(mod1lr);
-        }
-        if (UnityEngine.Input.GetKey(modifier1) && UnityEngine.Input.GetKey(down))
-        {
-            inputSelect(mod1down);
-        }
-
-        if (UnityEngine.Input.GetKey(modifier2) && UnityEngine.Input.GetKey(button1Input))
-        {
-            inputSelect(mod2button1);
-        }
-        if (UnityEngine.Input.GetKey(modifier2) && UnityEngine.Input.GetKey(button2Input))
-        {
-            inputSelect(mod2button2);
-        }
-        if (UnityEngine.Input.GetKey(modifier2) && UnityEngine.Input.GetMouseButton(0))
-        {
-            inputSelect(mod2mb1);
-        }
-        if (UnityEngine.Input.GetKey(modifier2) && UnityEngine.Input.GetMouseButton(1))
-        {
-            inputSelect(mod2mb2);
-        }
-        if (UnityEngine.Input.GetKey(modifier2) && (UnityEngine.Input.GetKey(left) || UnityEngine.Input.GetKey(right)))
-        {
-            inputSelect(mod2lr);
-        }
-        if (UnityEngine.Input.GetKey(modifier2) && UnityEngine.Input.GetKey(down))
-        {
-            inputSelect(mod2down);
-        }
-
-        mouseX = Input.mousePosition.x/Screen.width;
-        mouseY = Input.mousePosition.y/Screen.height;
-        screenPos = camera.WorldToViewportPoint(transform.position);
-
-        if (attack)
-        {
-            special = false;
-            dodgeInput = false;
-            rollInput = false;
-            if (mouseX >= screenPos.x )
-            {
-                mouseRight = true;
-            }
-            else
-            {
-                mouseRight = false;
-            }
-
-            if (UnityEngine.Input.GetKey(left) || UnityEngine.Input.GetKey(left))
-            {
-                fAttackInput = true;
-            }
-            else if (UnityEngine.Input.GetKey(jump) )
-            {
-                uAttackInput = true;
-            }
-            else if (UnityEngine.Input.GetKey(down) )
-            {
-                dAttackInput = true;
-            }
-            else
-            {
-                jabInput = true;
-            }
-
-            /*
-            //right quad
-            if (mouseY >-(mouseX-screenPos.x)+ screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
-            {
-                fAttackInput = true;
-                mouseRight = true;
-            }
-            //up quad
-            if (mouseY > -(mouseX - screenPos.x) + screenPos.y && mouseY >= (mouseX - screenPos.x) + screenPos.y)
-            {
-                uAttackInput = true;
-            }
-            //down quad
-            if (mouseY <= -(mouseX - screenPos.x) + screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
-            {
-                dAttackInput = true;
-            }
-            //left quad
-            if (mouseY <= -(mouseX - screenPos.x) + screenPos.y && mouseY >= (mouseX - screenPos.x) + screenPos.y)
-            {
-                fAttackInput = true;
-            }
-            */
-        }
-
-        if (special)
-        {
-            dodgeInput = false;
-            rollInput = false;
-
-            if (mouseX >= screenPos.x)
-            {
-                mouseRight = true;
-            }
-            else
-            {
-                mouseRight = false;
-            }
-
-            if (UnityEngine.Input.GetKey(left) || UnityEngine.Input.GetKey(left))
-            {
-                fSpecInput = true;
-            }
-            else if (UnityEngine.Input.GetKey(jump))
-            {
-                uSpecInput = true;
-            }
-            else if (UnityEngine.Input.GetKey(down))
-            {
-                dSpecInput = true;
-            }
-            else
-            {
-                nSpecInput = true;
-            }
-
-
-            /*
-            //right quad
-            if (mouseY > -(mouseX - screenPos.x) + screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
-            {
-                fSpecInput = true;
-                //Debug.Log("rspec"+mouseX+" "+mouseY + "pos "+ screenPos.x + ","+ screenPos.y );
-            }
-            //up quad
-            if (mouseY > -(mouseX - screenPos.x) + screenPos.y && mouseY >= (mouseX - screenPos.x) + screenPos.y)
-            {
-                uSpecInput = true;
-                //Debug.Log("uspec" + mouseX + " " + mouseY + "pos " + screenPos.x + "," + screenPos.y);
-            }
-            //down quad
-            if (mouseY <= -(mouseX - screenPos.x) + screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
-            {
-                dSpecInput = true;
-                //Debug.Log("dspec" + mouseX + " " + mouseY + "pos " + screenPos.x + "," + screenPos.y);
-            }
-            //left quad
-            if (mouseY <= -(mouseX - screenPos.x) + screenPos.y && mouseY >= (mouseX - screenPos.x) + screenPos.y)
-            {
-                fSpecInput = true;
-               // Debug.Log("lspec" + mouseX + " " + mouseY + "pos " + screenPos.x + "," + screenPos.y);
-            }
-            */
-        }
-
-
-        if (UnityEngine.Input.GetKey(left) && !(UnityEngine.Input.GetKey(modifier1) || UnityEngine.Input.GetKey(modifier2)))
-        {
-            leftInput = true;
-        }
-        if (UnityEngine.Input.GetKey(right) && !(UnityEngine.Input.GetKey(modifier1) || UnityEngine.Input.GetKey(modifier2)))
-        {
-            rightInput = true;
-        }
-        if (UnityEngine.Input.GetKey(down) && !(UnityEngine.Input.GetKey(modifier1) || UnityEngine.Input.GetKey(modifier2)))
-        {
-            downInput = true;
-        }
-        if (UnityEngine.Input.GetKeyDown(left) || UnityEngine.Input.GetKeyDown(right) && !(UnityEngine.Input.GetKey(modifier1) || UnityEngine.Input.GetKey(modifier2)))
-        {
-            dashInput = true;
-        }
-        if (UnityEngine.Input.GetKey(jump) && !(attack || special))
-        {
-            jumpInput = true;
-        }
-        if (UnityEngine.Input.GetKeyDown(jump) && !(attack || special))
-        {
-            jumpInputDown = true;
-        }
-        if (UnityEngine.Input.GetKey(left) )
-        {
-            leftMod = true;
-        }
-
-        if (UnityEngine.Input.GetKey(right) )
-        {
-            rightMod = true;
-        }
-
-
+        pc.inputUpdate();
 
 
         //high priority
@@ -2254,6 +2029,11 @@ public class ChallengerCon : MonoBehaviour
                 shieldInput = true;
                 break;
         }
+    }
+
+    public void blank()
+    {
+
     }
 
 }
