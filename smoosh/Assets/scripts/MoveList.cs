@@ -57,20 +57,9 @@ public class MoveList : ScriptableObject
         }
     }
 
-    /*
-    public void TMANjab()
-    {
-        this.state = "attacking";
-        this.lag = 10;
-        this.hbq = hbqueue.GetComponent<HBQ>();
-        this.hbq.DeQ(15, .5f, 200, Vector3.right, false, Vector3.zero,
-            2, Vector3.up, 10, 0, false, 0, 150, 10);
-        //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
-        //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
-    }
-    */
 
-
+    // TMAN //////////////////////////////////////////////////////////////
+    
 
     public void TMANfweak(int na)
     {

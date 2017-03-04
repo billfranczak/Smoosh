@@ -13,6 +13,8 @@ public class ChallengerCon : MonoBehaviour
     public string prof;
     public Camera camera;
 
+    public BlankBox bbox;
+
     //public delegate void move();
     //public move jab;
     public Action<int> jab;
@@ -45,6 +47,13 @@ public class ChallengerCon : MonoBehaviour
     hitbox currentHB;
 
     RaycastHit hit;
+
+    public int bbMax;
+    public GameObject bObj;
+    public List<GameObject> bbObjList;
+    public List<BlankBox> bbCompList;
+    BlankBox currentBB;
+
 
     public bool shiftwalk;
     public KeyCode left;
@@ -313,6 +322,12 @@ public class ChallengerCon : MonoBehaviour
             hbObjList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
 
 
+        }
+        bbox = new BlankBox(this);
+        //bbq
+        for (int i=0; i<bbMax; i++)
+        {
+            bbCompList.Add(Instantiate(bbox));
         }
 
         isHit = false;
@@ -1045,15 +1060,15 @@ public class ChallengerCon : MonoBehaviour
                     squatTimer--;
                     if (squatTimer == 0)
                     {
-                        Debug.Log("jumpSquat");
+                        //Debug.Log("jumpSquat");
                         if (fullhop)
                         {
-                            Debug.Log("FH");
+                            //Debug.Log("FH");
                             p1.AddForce(transform.up * fhJumpHeight);
                         }
                         else
                         {
-                            Debug.Log("SH");
+                            //Debug.Log("SH");
                             p1.AddForce(transform.up * shJumpHeight);
                         }
                         state = "airborn";
@@ -1098,7 +1113,7 @@ public class ChallengerCon : MonoBehaviour
                     p1.AddForce(transform.up * aJumpHeight);
 
                     jumps--;
-                    Debug.Log("DJ");
+                    //Debug.Log("DJ");
                 }
                 if (downInput)
                 {
@@ -1926,6 +1941,11 @@ public class ChallengerCon : MonoBehaviour
         hbCompList.Add(h);
     }
 
+    public void bbEnQ(BlankBox b)
+    {
+        bbCompList.Add(b);
+    }
+
     public void DeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction,
         int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
     {
@@ -1960,6 +1980,17 @@ public class ChallengerCon : MonoBehaviour
     //DeQ parameter list:
     //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
+
+    public void bbDeQ (Action<int> a)
+    {
+        currentBB = bbCompList[0];
+        bbCompList.Remove(bbCompList[0]);
+        currentBB.act = a;
+    }
+
+
+
+
 
     public void inputSelect(string input)
     {
