@@ -1,0 +1,151 @@
+fileFormatVersion: 2
+guid: 757e9d7617f99ac4eb83e13e068d6d49
+timeCreated: 1488599416
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: C_Cog_Joint
+    100002: C_Head_Joint
+    100004: C_Neck_1_Joint
+    100006: C_Neck_2_Joint
+    100008: C_Neck_3_Joint
+    100010: C_Spine_1_Joint
+    100012: C_Spine_2_Joint
+    100014: C_Spine_3_Joint
+    100016: C_Spine_4_Joint
+    100018: C_Spine_5_Joint
+    100020: C_Tip_Joint
+    100022: joint12
+    100024: L_Ankel_Joint
+    100026: L_Ball_Joint
+    100028: L_Blade_Joint
+    100030: L_Elbow_Joint
+    100032: L_Finger_Joint
+    100034: L_Hand_Joint
+    100036: L_Hip_Joint
+    100038: L_Knee_Joint
+    100040: L_Shoulder_Joint
+    100042: L_Toe_Joint
+    100044: L_Wrist_Joint
+    100046: R_Ankel_Joint
+    100048: R_Ball_Joint
+    100050: R_Blade_Joint
+    100052: R_Elbow_Joint
+    100054: R_Finger_Joint
+    100056: R_Hand_Joint
+    100058: R_Hip_Joint
+    100060: R_Knee_Joint
+    100062: R_Shoulder_Joint
+    100064: R_Toe_Joint
+    100066: R_Wrist_Joint
+    100068: TESTER_MAN
+    100070: //RootNode
+    400000: C_Cog_Joint
+    400002: C_Head_Joint
+    400004: C_Neck_1_Joint
+    400006: C_Neck_2_Joint
+    400008: C_Neck_3_Joint
+    400010: C_Spine_1_Joint
+    400012: C_Spine_2_Joint
+    400014: C_Spine_3_Joint
+    400016: C_Spine_4_Joint
+    400018: C_Spine_5_Joint
+    400020: C_Tip_Joint
+    400022: joint12
+    400024: L_Ankel_Joint
+    400026: L_Ball_Joint
+    400028: L_Blade_Joint
+    400030: L_Elbow_Joint
+    400032: L_Finger_Joint
+    400034: L_Hand_Joint
+    400036: L_Hip_Joint
+    400038: L_Knee_Joint
+    400040: L_Shoulder_Joint
+    400042: L_Toe_Joint
+    400044: L_Wrist_Joint
+    400046: R_Ankel_Joint
+    400048: R_Ball_Joint
+    400050: R_Blade_Joint
+    400052: R_Elbow_Joint
+    400054: R_Finger_Joint
+    400056: R_Hand_Joint
+    400058: R_Hip_Joint
+    400060: R_Knee_Joint
+    400062: R_Shoulder_Joint
+    400064: R_Toe_Joint
+    400066: R_Wrist_Joint
+    400068: TESTER_MAN
+    400070: //RootNode
+    4300000: TESTER_MAN
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: TESTER_MAN
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 25
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
