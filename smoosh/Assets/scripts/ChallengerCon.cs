@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 using UnityEngine;
+
 using System;
 
-public class ChallengerCon : MonoBehaviour
+public class ChallengerCon : NetworkBehaviour
 {
 
     
@@ -275,6 +277,12 @@ public class ChallengerCon : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        if (!isLocalPlayer)
+        {
+            Destroy(this);
+            return;
+        }
+
         camera = Camera.main;
         
         frameData = new FrameData("TMan"); //move to constructor
