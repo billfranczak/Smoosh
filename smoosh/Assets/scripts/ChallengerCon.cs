@@ -259,7 +259,7 @@ public class ChallengerCon : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        camera = Camera.main;
         
         frameData = new FrameData("TMan"); //move to constructor
         moveList = new MoveList(this,"TMan");
@@ -721,6 +721,7 @@ public class ChallengerCon : MonoBehaviour
                 if (leftInput)
                 {
                     facingr1 = false;
+                    
                     if (dashTimer > 0 && dashInput)
                     {
                         p1.velocity = Vector3.zero;
@@ -745,6 +746,7 @@ public class ChallengerCon : MonoBehaviour
                 if (rightInput)
                 {
                     facingr1 = true;
+                    
                     if (dashTimer > 0 && dashInput)
                     {
                         p1.velocity = Vector3.zero;
@@ -1776,8 +1778,18 @@ public class ChallengerCon : MonoBehaviour
             special = false;
             mouseRight = false;
         }
+        if( facingr1)
+        {
+            //Change Facing direction, Hacked together and hard coded to shit plz fix
+            animMesh.transform.parent.transform.localEulerAngles = new Vector3(0, 90, 0);
+        }
+        if (!facingr1)
+        {
+            //Change Facing direction, Hacked together and hard coded to shit plz fix
+            animMesh.transform.parent.transform.localEulerAngles = new Vector3(0, -90, 0);
+        }
 
-    }
+    }//Workflow End of Update
 
     void OnCollisionEnter(Collision col)
     {
