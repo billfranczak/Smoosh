@@ -8,12 +8,14 @@ using System;
 public class ChallengerCon : NetworkBehaviour
 {
 
-    
+    public GameObject animObject;
+    public GameObject animMesh;
+    public Camera camera;
     public FrameData frameData;
     public MoveList moveList;
     public Profiles profile;
     public string prof;
-    public Camera camera;
+
 
     public BlankBox bbox;
 
@@ -99,8 +101,7 @@ public class ChallengerCon : NetworkBehaviour
 
     public Vector3 pos;
     public Rigidbody p1;  //this could be named better
-    public GameObject animObject;
-    public GameObject animMesh;
+
     public Renderer p1rend;
     public Transform temptrans;
     public int thisPlayer;
@@ -277,9 +278,10 @@ public class ChallengerCon : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
+        
         if (!isLocalPlayer)
         {
-            Destroy(this);
+           
             return;
         }
 
@@ -503,8 +505,14 @@ public class ChallengerCon : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void Update() //Workflow End of Update
     {
+
+        if (!isLocalPlayer)
+        {
+
+            return;
+        }
         pos = transform.position;
 
         pc.inputUpdate();
@@ -1785,15 +1793,16 @@ public class ChallengerCon : NetworkBehaviour
             mouseRight = false;
             attackBehind = false;
         }
-        if( facingr1)
+
+        if (facingr1)
         {
             //Change Facing direction, Hacked together and hard coded to shit plz fix
-            animMesh.transform.parent.transform.localEulerAngles = new Vector3(0, 90, 0);
+            CmdFacing(180);
         }
         if (!facingr1)
         {
             //Change Facing direction, Hacked together and hard coded to shit plz fix
-            animMesh.transform.parent.transform.localEulerAngles = new Vector3(0, -90, 0);
+            CmdFacing(0);
         }
 
     }//Workflow End of Update
@@ -2042,6 +2051,12 @@ public class ChallengerCon : NetworkBehaviour
     public void blank()
     {
 
+    }
+
+    [Command]
+    void CmdFacing (float dir)
+    {
+        animObject.transform.localEulerAngles = new Vector3(0, dir, 0);
     }
 
 }
