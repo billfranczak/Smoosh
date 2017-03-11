@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class MoveList : ScriptableObject
+public class MoveListNet : ScriptableObject
 {
 
-    ChallengerCon p1;
+    ChallengerConNet p1;
 
     public Action<int> jab;
     public Action<int> grab;
@@ -30,13 +30,13 @@ public class MoveList : ScriptableObject
     public Action<int> resUpdate;
     public int numResources;
 
-    public MoveList (ChallengerCon player, string character)
+    public MoveListNet(ChallengerConNet player, string character)
     {
 
         p1 = player;
         switch (character)
         {
-            
+
             case "TMan":
 
                 jab = TMANjab;
@@ -58,7 +58,7 @@ public class MoveList : ScriptableObject
                 dspec = TMANdspec;
                 numResources = 2;
                 resUpdate = TMANresUpdate;
-               
+
 
                 break;
         }
@@ -123,24 +123,24 @@ public class MoveList : ScriptableObject
 
     public void TMANnspec(int na)
     {
-        if (p1.resource[1]>0)
+        if (p1.resource[1] > 0)
         {
             p1.resource[1]--;
             p1.state = "attacking";
             p1.lag = 7;
             p1.bbDeQ();
-            BlankBox bb = p1.currentBB;
+            BlankBoxNet bb = p1.currentBB;
             bb.duration = 4;
-            bb.act= delegate (int n) 
+            bb.act = delegate (int n)
             {
                 bb.duration--;
                 if (bb.duration == 1)
                 {
                     //
-                    p1.transform.position += Vector3.right*((p1.mouseX-p1.screenPos.x)/ (float) Math.Sqrt((p1.mouseX - p1.screenPos.x)* (p1.mouseX - p1.screenPos.x)+ (p1.mouseY - p1.screenPos.y) * (p1.mouseY - p1.screenPos.y)));
+                    p1.transform.position += Vector3.right * ((p1.mouseX - p1.screenPos.x) / (float)Math.Sqrt((p1.mouseX - p1.screenPos.x) * (p1.mouseX - p1.screenPos.x) + (p1.mouseY - p1.screenPos.y) * (p1.mouseY - p1.screenPos.y)));
                     p1.transform.position += Vector3.up * ((p1.mouseY - p1.screenPos.y) / (float)Math.Sqrt((p1.mouseX - p1.screenPos.x) * (p1.mouseX - p1.screenPos.x) + (p1.mouseY - p1.screenPos.y) * (p1.mouseY - p1.screenPos.y)));
                 }
-                if (bb.duration ==0)
+                if (bb.duration == 0)
                 {
                     p1.bbEnQ(bb);
                     bb.act = bb.blank;
@@ -187,13 +187,13 @@ public class MoveList : ScriptableObject
     public void TMANresUpdate(int na)
     {
         //Debug.Log("update");
-        if (p1.resource[0]<120)
+        if (p1.resource[0] < 120)
         {
             p1.resource[0]++;
         }
         else
         {
-            if (p1.resource[1]<2)
+            if (p1.resource[1] < 2)
             {
                 p1.resource[1]++;
                 p1.resource[0] = 0;

@@ -5,19 +5,19 @@ using UnityEngine;
 
 using System;
 
-public class ChallengerCon : MonoBehaviour
+public class ChallengerConNet : NetworkBehaviour
 {
 
     public GameObject animObject;
     public GameObject animMesh;
     public Camera camera;
     public FrameData frameData;
-    public MoveList moveList;
+    public MoveListNet moveList;
     public Profiles profile;
     public string prof;
 
 
-    public BlankBox bbox;
+    public BlankBoxNet bbox;
 
     //public delegate void move();
     //public move jab;
@@ -40,7 +40,7 @@ public class ChallengerCon : MonoBehaviour
     public Action<int> dAir;
     public Action<int> dashAttack;
 
-    
+
 
     /*
     public GameObject hbqueue;
@@ -51,16 +51,16 @@ public class ChallengerCon : MonoBehaviour
     public int hbMax;
     public GameObject pcObj;
     public List<GameObject> hbObjList;
-    public List<hitbox> hbCompList;
-    hitbox currentHB;
+    public List<hitboxNet> hbCompList;
+    hitboxNet currentHB;
 
     RaycastHit hit;
 
     public int bbMax;
     public GameObject bObj;
     public List<GameObject> bbObjList;
-    public List<BlankBox> bbCompList;
-    public BlankBox currentBB;
+    public List<BlankBoxNet> bbCompList;
+    public BlankBoxNet currentBB;
 
 
     public bool shiftwalk;
@@ -98,7 +98,6 @@ public class ChallengerCon : MonoBehaviour
     public Action<int> resUpdate;
     public int numResources;
 
-    public float dir;
 
     public Vector3 pos;
     public Rigidbody p1;  //this could be named better
@@ -274,21 +273,26 @@ public class ChallengerCon : MonoBehaviour
 
     public Vector3 screenPos;
 
-    PlayerController pc;
+    public PlayerControllerNet pc;
 
     // Use this for initialization
     void Start()
     {
-        
 
+        if (!isLocalPlayer)
+        {
+
+            return;
+        }
 
         camera = Camera.main;
-        
+
         frameData = new FrameData("TMan"); //move to constructor
-        moveList = new MoveList(this,"TMan");
+        moveList = new MoveListNet(this, "TMan");
         profile = new Profiles();
         dmg = 0;
         thisPlayer = 1;
+        Debug.Log("get renderer");
         p1 = GetComponent<Rigidbody>();
         p1rend = animMesh.GetComponent<Renderer>();
 
@@ -336,7 +340,7 @@ public class ChallengerCon : MonoBehaviour
             //instantiate a sphere
             hbObjList.Add(GameObject.CreatePrimitive(PrimitiveType.Sphere));
             //add hitbox Component to that sphere and to our hitbox component list
-            hbCompList.Add(hbObjList[i].AddComponent<hitbox>());
+            hbCompList.Add(hbObjList[i].AddComponent<hitboxNet>());
             //hbCompList[i].player = gameObject;
             hbCompList[i].p = this;
             hbCompList[i].offset = i;
@@ -353,11 +357,11 @@ public class ChallengerCon : MonoBehaviour
         bbMax = frameData.bbMax;
 
         //bbq
-        for (int i=0; i<bbMax; i++)
+        for (int i = 0; i < bbMax; i++)
         {
             //bbCompList.Add(Instantiate(bbox));
             bbObjList.Add(GameObject.CreatePrimitive(PrimitiveType.Sphere));
-            bbCompList.Add(bbObjList[i].AddComponent<BlankBox>());
+            bbCompList.Add(bbObjList[i].AddComponent<BlankBoxNet>());
             bbCompList[i].player = this;
             bbObjList[i].transform.position = new Vector3(-20, 5 + 5 * i, 3);
         }
@@ -490,22 +494,26 @@ public class ChallengerCon : MonoBehaviour
         numResources = moveList.numResources;
 
         resource = new int[numResources];
-        for (int n=0;n<numResources;n++)
+        for (int n = 0; n < numResources; n++)
         {
             resource[n] = 0;
         }
 
         resUpdate = moveList.resUpdate;
-
-        pc = new PlayerController(this);
-
+        Debug.Log("pc");
+        pc = new PlayerControllerNet(this);
+        Debug.Log(pc);
     }
 
     // Update is called once per frame
     void Update() //Workflow End of Update
     {
 
+        if (!isLocalPlayer)
+        {
 
+            return;
+        }
         pos = transform.position;
 
         pc.inputUpdate();
@@ -609,7 +617,7 @@ public class ChallengerCon : MonoBehaviour
                 if (leftInput)
                 {
                     facingr1 = false;
-                    
+
                     if (dashTimer > 0 && dashInput)
                     {
                         p1.velocity = Vector3.zero;
@@ -634,7 +642,7 @@ public class ChallengerCon : MonoBehaviour
                 if (rightInput)
                 {
                     facingr1 = true;
-                    
+
                     if (dashTimer > 0 && dashInput)
                     {
                         p1.velocity = Vector3.zero;
@@ -931,7 +939,7 @@ public class ChallengerCon : MonoBehaviour
 
             case "jumpsquat":
 
-                
+
                 p1rend.material.color = Color.magenta;
 
                 if (uAttackInput)
@@ -1052,7 +1060,7 @@ public class ChallengerCon : MonoBehaviour
                     if (mouseRight == facingr1)
                     {
                         fAir(0);
-                    } 
+                    }
                     else
                     {
                         bAir(0);
@@ -1757,7 +1765,7 @@ public class ChallengerCon : MonoBehaviour
         }
 
         //if not hold buffer
-        if (0==0)
+        if (0 == 0)
         {
             leftInput = false;
             rightInput = false;
@@ -1797,7 +1805,6 @@ public class ChallengerCon : MonoBehaviour
             //Change Facing direction, Hacked together and hard coded to shit plz fix
             CmdFacing(0);
         }
-
 
     }//Workflow End of Update
 
@@ -1839,7 +1846,7 @@ public class ChallengerCon : MonoBehaviour
         if (collider.tag == "hitbox")
         {
 
-            currentHB = collider.GetComponent<hitbox>();
+            currentHB = collider.GetComponent<hitboxNet>();
             if ((currentHB.playerNum != thisPlayer) && currentHB.special == "" && isHit == false && inShield == false && intangible == false)
             {
                 //Debug.Log("extra dildos");
@@ -1958,12 +1965,12 @@ public class ChallengerCon : MonoBehaviour
         }
     }
 
-    public void EnQ(hitbox h) //once a move is copmleted, a hitbox is added to the unused hitbox list
+    public void EnQ(hitboxNet h) //once a move is copmleted, a hitbox is added to the unused hitbox list
     {
         hbCompList.Add(h);
     }
 
-    public void bbEnQ(BlankBox b)
+    public void bbEnQ(BlankBoxNet b)
     {
         bbCompList.Add(b);
     }
@@ -2003,7 +2010,7 @@ public class ChallengerCon : MonoBehaviour
     //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
 
-    public void bbDeQ () //Action<int> a
+    public void bbDeQ() //Action<int> a
     {
         currentBB = bbCompList[0];
         bbCompList.Remove(bbCompList[0]);
@@ -2047,8 +2054,8 @@ public class ChallengerCon : MonoBehaviour
 
     }
 
-    
-    void CmdFacing (float dir)
+    [Command]
+    void CmdFacing(float dir)
     {
         animObject.transform.localEulerAngles = new Vector3(0, dir, 0);
     }
