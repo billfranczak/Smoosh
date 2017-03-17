@@ -16,6 +16,7 @@ public class ChallengerConNet : NetworkBehaviour
     public Profiles profile;
     public string prof;
 
+    public GameObject HitboxPrefab;
 
     public BlankBoxNet bbox;
 
@@ -292,7 +293,7 @@ public class ChallengerConNet : NetworkBehaviour
         profile = new Profiles();
         dmg = 0;
         thisPlayer = 1;
-        Debug.Log("get renderer");
+        //Debug.Log("get renderer");
         p1 = GetComponent<Rigidbody>();
         p1rend = animMesh.GetComponent<Renderer>();
 
@@ -337,18 +338,7 @@ public class ChallengerConNet : NetworkBehaviour
         //hitbox queue
         for (int i = 0; i < hbMax; i++)
         {
-            //instantiate a sphere
-            hbObjList.Add(GameObject.CreatePrimitive(PrimitiveType.Sphere));
-            //add hitbox Component to that sphere and to our hitbox component list
-            hbCompList.Add(hbObjList[i].AddComponent<hitboxNet>());
-            //hbCompList[i].player = gameObject;
-            hbCompList[i].p = this;
-            hbCompList[i].offset = i;
-            hbObjList[i].GetComponent<SphereCollider>().isTrigger = true;
-            hbObjList[i].tag = "hitbox";
-            hbObjList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
-
-
+            CmdSpawnHitboxes(i);
         }
 
 
@@ -500,9 +490,9 @@ public class ChallengerConNet : NetworkBehaviour
         }
 
         resUpdate = moveList.resUpdate;
-        Debug.Log("pc");
+        //Debug.Log("pc");
         pc = new PlayerControllerNet(this);
-        Debug.Log(pc);
+        //Debug.Log(pc);
     }
 
     // Update is called once per frame
@@ -1795,16 +1785,35 @@ public class ChallengerConNet : NetworkBehaviour
             attackBehind = false;
         }
 
-        if (facingr1)
+        if (!Network.isServer)
         {
-            //Change Facing direction, Hacked together and hard coded to shit plz fix
-            CmdFacing(180);
+            if (facingr1)
+            {
+                //Change Facing direction, Hacked together and hard coded to shit plz fix
+                CmdFacing(180);
+            }
+            if (!facingr1)
+            {
+                //Change Facing direction, Hacked together and hard coded to shit plz fix
+                CmdFacing(0);
+            }
+
         }
-        if (!facingr1)
+        else
         {
-            //Change Facing direction, Hacked together and hard coded to shit plz fix
-            CmdFacing(0);
+            if (facingr1)
+            {
+                //Change Facing direction, Hacked together and hard coded to shit plz fix
+                RpcFacing(180);
+            }
+            if (!facingr1)
+            {
+                //Change Facing direction, Hacked together and hard coded to shit plz fix
+                RpcFacing(0);
+            }
         }
+
+
 
     }//Workflow End of Update
 
@@ -2057,7 +2066,45 @@ public class ChallengerConNet : NetworkBehaviour
     [Command]
     void CmdFacing(float dir)
     {
+        RpcFacing(dir);
+    }
+
+    [ClientRpc]
+    void RpcFacing(float dir)
+    {
         animObject.transform.localEulerAngles = new Vector3(0, dir, 0);
+    }
+
+    [Command]
+    void CmdSpawnHitboxes(int i)
+    {
+        GameObject HBinstance = Instantiate(HitboxPrefab);
+
+        hbCompList.Add(HBinstance.GetComponent<hitboxNet>());
+        hbCompList[i].p = this;
+        hbCompList[i].offset = i;
+        hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
+
+        NetworkServer.Spawn(HBinstance);
+    }
+
+    /*
+        //instantiate a sphere
+            hbObjList.Add(GameObject.CreatePrimitive(PrimitiveType.Sphere));
+            //add hitbox Component to that sphere and to our hitbox component list
+            hbCompList.Add(hbObjList[i].AddComponent<hitboxNet>());
+            hbCompList[i].player = gameObject;
+            hbCompList[i].p = this;
+            hbCompList[i].offset = i;
+            hbObjList[i].GetComponent<SphereCollider>().isTrigger = true;
+            hbObjList[i].tag = "hitbox";
+            hbObjList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
+     */
+
+    [ClientRpc]
+    void RpcSpawnHitboxes()
+    {
+
     }
 
 }

@@ -1,24 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class hitboxNet : MonoBehaviour
+public class hitboxNet : NetworkBehaviour
 {
 
-
+    
     public GameObject player;
     public GameObject queue;
     public ChallengerConNet p;
+    [SyncVar]
     public Transform pos;
     public Renderer hbrend;
 
     //properties of a hitbox used imminently
+    [SyncVar]
     public bool active; //turns on hitbox
+    [SyncVar]
     public int activeOn; //first frame hitbox becomes active -- !!!!move activeOn to player, to prevent attacks from happening if a player is interupted!!!!
+    [SyncVar]
     public float size;
+    [SyncVar]
     public int duration;
+    [SyncVar]
     public Vector3 location;
+    [SyncVar]
     public bool tethered; //punch vs missile
+    [SyncVar]
     public Vector3 direction; // hitbox listens for updates to this
 
     //may just use direct manipulation of 'direction' to do this
@@ -26,13 +35,21 @@ public class hitboxNet : MonoBehaviour
     public float floaty; //how gravity affects it
 
     //properties that are only important on contact
+    [SyncVar]
     public int playerNum; //who spawned the hitbox
+    [SyncVar]
     public Vector3 angle; //angle the victom is sent off at
+    [SyncVar]
     public int dmg;
+    [SyncVar]
     public int sdmg; //sheild dmg
+    [SyncVar]
     public bool grab; //grabs >> shields
+    [SyncVar]
     public int priority;  //The raiting at wich a move will overide another simulataneously cast and overlapping move
+    [SyncVar]
     public float bkb; //base knockback
+    [SyncVar]
     public float skb; //scaling knockback
     public int atkDir;
 
