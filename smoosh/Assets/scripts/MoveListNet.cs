@@ -164,7 +164,7 @@ public class MoveListNet : ScriptableObject
     {
         p1.state = "attacking";
         p1.lag = 10;
-        p1.DeQ(15, .5f, 200, Vector3.right * p1.currentDir, false, Vector3.zero,
+        p1.CmdDeQ(15, .5f, 200, Vector3.right * p1.currentDir, false, Vector3.zero,
             2, Vector3.up, 10, 0, false, 0, 150, 10);
         //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
         //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb

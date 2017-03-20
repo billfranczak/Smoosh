@@ -17,6 +17,7 @@ public class ChallengerConNet : NetworkBehaviour
     public string prof;
 
     public GameObject HitboxPrefab;
+    public ChallengerConNet self;
 
     public BlankBoxNet bbox;
 
@@ -335,10 +336,23 @@ public class ChallengerConNet : NetworkBehaviour
 
         hbMax = frameData.hbMax;
 
+
+        self = this;
         //hitbox queue
         for (int i = 0; i < hbMax; i++)
         {
-            CmdSpawnHitboxes(i);
+            //CmdSpawnHitboxes(gameObject , i);
+
+            GameObject HBinstance = Instantiate(HitboxPrefab);
+            /*
+            hbCompList.Add(HBinstance.GetComponent<hitboxNet>());
+            hbCompList[i].p = self;
+            hbCompList[i].offset = i;
+            hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
+            Debug.Log(HBinstance.GetComponent<NetworkIdentity>().netId); 
+            CmdSpawnHitboxes2(HBinstance.GetComponent<NetworkIdentity>().netId, i);
+            */
+            CmdSpawnHitboxes3(this.GetComponent<NetworkIdentity>().netId, i);
         }
 
 
@@ -1794,7 +1808,6 @@ public class ChallengerConNet : NetworkBehaviour
             }
             if (!facingr1)
             {
-                //Change Facing direction, Hacked together and hard coded to shit plz fix
                 CmdFacing(0);
             }
 
@@ -1803,12 +1816,10 @@ public class ChallengerConNet : NetworkBehaviour
         {
             if (facingr1)
             {
-                //Change Facing direction, Hacked together and hard coded to shit plz fix
                 RpcFacing(180);
             }
             if (!facingr1)
             {
-                //Change Facing direction, Hacked together and hard coded to shit plz fix
                 RpcFacing(0);
             }
         }
@@ -1978,7 +1989,13 @@ public class ChallengerConNet : NetworkBehaviour
     {
         hbCompList.Add(h);
     }
-
+    /*
+    [Command]
+    public void CmdEnQ (hitboxNet h)
+    {
+        hbCompList.Add(h);
+    }
+    */
     public void bbEnQ(BlankBoxNet b)
     {
         bbCompList.Add(b);
@@ -2019,13 +2036,42 @@ public class ChallengerConNet : NetworkBehaviour
     //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
 
+    [Command]
+    public void CmdDeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction,
+        int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
+    {
+        //Debug.Log("1", gameObject);
+        currentHB = hbCompList[0]; //refactor potential
+
+        //Question??? if we take the 0 index out of a list does that make the 1 index roll down to 0???? O>o
+        //--yes
+
+        //Debug.Log("2", gameObject);
+        hbCompList.Remove(hbCompList[0]);
+        //Debug.Log("3", gameObject);
+        currentHB.activeOn = activeOn;
+        currentHB.size = size;
+        currentHB.duration = duration;
+        currentHB.location = location;
+        currentHB.tethered = tethered;
+        currentHB.direction = direction;
+
+        currentHB.playerNum = playerNum;
+        currentHB.angle = angle;
+        currentHB.dmg = dmg;
+        currentHB.sdmg = sdmg;
+        currentHB.grab = grab;
+        currentHB.priority = priority;
+        currentHB.bkb = bkb;
+        currentHB.skb = skb;
+    }
+
     public void bbDeQ() //Action<int> a
     {
         currentBB = bbCompList[0];
         bbCompList.Remove(bbCompList[0]);
         //currentBB.act = a;
     }
-
 
 
 
@@ -2076,17 +2122,64 @@ public class ChallengerConNet : NetworkBehaviour
     }
 
     [Command]
-    void CmdSpawnHitboxes(int i)
+    void CmdSpawnHitboxes(GameObject c, int i)
     {
         GameObject HBinstance = Instantiate(HitboxPrefab);
 
-        hbCompList.Add(HBinstance.GetComponent<hitboxNet>());
-        hbCompList[i].p = this;
-        hbCompList[i].offset = i;
-        hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
+        c.GetComponent<ChallengerConNet>().hbCompList.Add(HBinstance.GetComponent<hitboxNet>());
+        c.GetComponent<ChallengerConNet>().hbCompList[i].p = c.GetComponent<ChallengerConNet>();
+        c.GetComponent<ChallengerConNet>().hbCompList[i].offset = i;
+        c.GetComponent<ChallengerConNet>().hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
 
         NetworkServer.Spawn(HBinstance);
     }
+
+    [Command]
+    void CmdSpawnHitboxes2(NetworkInstanceId h,int i)
+    {
+        GameObject obj;
+        /*
+        if (!isServer)
+        {
+            obj = ClientScene.FindLocalObject(h);
+        } 
+        else
+        {
+            obj = NetworkServer.FindLocalObject(h);
+        }
+        */
+        //obj = NetworkServer.FindLocalObject(h);
+        obj = ClientScene.FindLocalObject(h);
+        Debug.Log(h);
+        NetworkServer.Spawn(obj);
+        
+    }
+
+    [Command]
+    void CmdSpawnHitboxes3(NetworkInstanceId objID, int i)
+    {
+        GameObject HBinstance = Instantiate(HitboxPrefab);
+        ChallengerConNet c;
+        GameObject obj;
+
+        if (!isServer)
+        {
+            obj = ClientScene.FindLocalObject(objID);
+        }
+        else
+        {
+            obj = NetworkServer.FindLocalObject(objID);
+        }
+        c = obj.GetComponent<ChallengerConNet>();
+        //Debug.Log(objID);
+        c.GetComponent<ChallengerConNet>().hbCompList.Add(HBinstance.GetComponent<hitboxNet>());
+        c.GetComponent<ChallengerConNet>().hbCompList[i].p = c.GetComponent<ChallengerConNet>();
+        c.GetComponent<ChallengerConNet>().hbCompList[i].offset = i;
+        c.GetComponent<ChallengerConNet>().hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
+
+        NetworkServer.Spawn(HBinstance);
+    }
+
 
     /*
         //instantiate a sphere
