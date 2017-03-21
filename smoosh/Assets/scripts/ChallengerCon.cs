@@ -1968,7 +1968,7 @@ public class ChallengerCon : MonoBehaviour
         bbCompList.Add(b);
     }
 
-    public void DeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction,
+    public void DeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation,
         int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
     {
         //Debug.Log("1", gameObject);
@@ -1986,6 +1986,7 @@ public class ChallengerCon : MonoBehaviour
         currentHB.location = location;
         currentHB.tethered = tethered;
         currentHB.direction = direction;
+        currentHB.rotation = rotation;
 
         currentHB.playerNum = playerNum;
         currentHB.angle = angle;

@@ -29,6 +29,8 @@ public class hitboxNet : NetworkBehaviour
     public bool tethered; //punch vs missile
     [SyncVar]
     public Vector3 direction; // hitbox listens for updates to this
+    [SyncVar]
+    public float rotation;
 
     //may just use direct manipulation of 'direction' to do this
     public bool grav; // is the projectile affected by gravity
@@ -101,7 +103,11 @@ public class hitboxNet : NetworkBehaviour
             if (tethered)
             {
                 pos.position = p.transform.position + location;
-
+                Vector3 temp = location;
+                temp.x = location.x*Mathf.Cos(rotation) - location.y*Mathf.Sin(rotation);
+                temp.y = location.x * Mathf.Sin(rotation) + location.y * Mathf.Cos(rotation);
+                location = temp;
+                location = location + direction;
             }
             else
             {

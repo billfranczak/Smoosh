@@ -2001,7 +2001,7 @@ public class ChallengerConNet : NetworkBehaviour
         bbCompList.Add(b);
     }
 
-    public void DeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction,
+    public void DeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation,
         int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
     {
         //Debug.Log("1", gameObject);
@@ -2019,6 +2019,7 @@ public class ChallengerConNet : NetworkBehaviour
         currentHB.location = location;
         currentHB.tethered = tethered;
         currentHB.direction = direction;
+        currentHB.rotation = rotation;
 
         currentHB.playerNum = playerNum;
         currentHB.angle = angle;
@@ -2033,11 +2034,11 @@ public class ChallengerConNet : NetworkBehaviour
         //assign paramters
     }
     //DeQ parameter list:
-    //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
+    //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation
     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
 
     [Command]
-    public void CmdDeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction,
+    public void CmdDeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation,
         int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
     {
         //Debug.Log("1", gameObject);
@@ -2055,6 +2056,7 @@ public class ChallengerConNet : NetworkBehaviour
         currentHB.location = location;
         currentHB.tethered = tethered;
         currentHB.direction = direction;
+        currentHB.rotation = rotation;
 
         currentHB.playerNum = playerNum;
         currentHB.angle = angle;
@@ -2092,7 +2094,7 @@ public class ChallengerConNet : NetworkBehaviour
             case "roll":
                 rollInput = true;
                 break;
-            case "attack":
+            case "normal":
                 attack = true;
                 break;
             case "special":
@@ -2120,6 +2122,19 @@ public class ChallengerConNet : NetworkBehaviour
     {
         animObject.transform.localEulerAngles = new Vector3(0, dir, 0);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     [Command]
     void CmdSpawnHitboxes(GameObject c, int i)
@@ -2180,19 +2195,7 @@ public class ChallengerConNet : NetworkBehaviour
         NetworkServer.Spawn(HBinstance);
     }
 
-
-    /*
-        //instantiate a sphere
-            hbObjList.Add(GameObject.CreatePrimitive(PrimitiveType.Sphere));
-            //add hitbox Component to that sphere and to our hitbox component list
-            hbCompList.Add(hbObjList[i].AddComponent<hitboxNet>());
-            hbCompList[i].player = gameObject;
-            hbCompList[i].p = this;
-            hbCompList[i].offset = i;
-            hbObjList[i].GetComponent<SphereCollider>().isTrigger = true;
-            hbObjList[i].tag = "hitbox";
-            hbObjList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
-     */
+   
 
     [ClientRpc]
     void RpcSpawnHitboxes()

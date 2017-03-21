@@ -105,7 +105,12 @@ public class MoveListNet : ScriptableObject
 
     public void TMANfair(int na)
     {
-        blank();
+        p1.state = "attacking";
+        p1.lag = 45;
+        p1.CmdDeQ(9, .3f, 25, Vector3.right * p1.currentDir*.5f+Vector3.up*.5f, true, Vector3.zero, -p1.currentDir*.1f,
+            1, Vector3.up, 10, 0, false, 0, 150, 10);
+        //int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation,
+         //int playerNum, Vector3 angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb)
     }
 
     public void TMANbair(int na)
@@ -164,9 +169,9 @@ public class MoveListNet : ScriptableObject
     {
         p1.state = "attacking";
         p1.lag = 10;
-        p1.CmdDeQ(15, .5f, 200, Vector3.right * p1.currentDir, false, Vector3.zero,
+        p1.CmdDeQ(15, .5f, 200, Vector3.right * p1.currentDir, false, Vector3.zero, 0,
             2, Vector3.up, 10, 0, false, 0, 150, 10);
-        //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
+        //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation
         //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
     }
 
@@ -174,9 +179,9 @@ public class MoveListNet : ScriptableObject
     {
         p1.state = "attacking";
         p1.lag = 60;
-        p1.DeQ(15, .2f, 55, Vector3.right * p1.currentDir, true, Vector3.zero,
+        p1.CmdDeQ(15, .2f, 55, Vector3.right * p1.currentDir, true, Vector3.zero, 0,
         1, Vector3.up, 5, 5, false, 0, 50, 10);
-        //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction
+        //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation
         //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
     }
     public void TMANgrab(int na)

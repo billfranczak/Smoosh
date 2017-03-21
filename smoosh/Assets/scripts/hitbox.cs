@@ -19,6 +19,7 @@ public class hitbox : MonoBehaviour {
     public Vector3 location;
     public bool tethered; //punch vs missile
     public Vector3 direction; // hitbox listens for updates to this
+    public float rotation;
 
     //may just use direct manipulation of 'direction' to do this
     public bool grav; // is the projectile affected by gravity
@@ -71,6 +72,10 @@ public class hitbox : MonoBehaviour {
                 {
                     active = true;
                     pos.position = p.transform.position + location;
+                    Vector3 temp = location;
+                    temp.x = location.x * Mathf.Cos(rotation) - location.y * Mathf.Sin(rotation);
+                    temp.y = location.x * Mathf.Sin(rotation) + location.y * Mathf.Cos(rotation);
+                    location = temp;
                     hbrend.material.color = Color.red;
                 }
             }

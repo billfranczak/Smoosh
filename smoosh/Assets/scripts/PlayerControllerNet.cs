@@ -98,6 +98,34 @@ public class PlayerControllerNet : ScriptableObject
             player.special = false;
             player.dodgeInput = false;
             player.rollInput = false;
+
+            if (player.mouseX >= player.screenPos.x)
+            {
+                player.mouseRight = true;
+            }
+            else
+            {
+                player.mouseRight = false;
+            }
+
+            if (UnityEngine.Input.GetKey(player.left) || UnityEngine.Input.GetKey(player.right))
+            {
+                player.fAttackInput = true;
+            }
+            else if (UnityEngine.Input.GetKey(player.jump))
+            {
+                player.uAttackInput = true;
+            }
+            else if (UnityEngine.Input.GetKey(player.down))
+            {
+                player.dAttackInput = true;
+            }
+            else
+            {
+                player.jabInput = true;
+            }
+
+            /*
             if (player.mouseX >= player.screenPos.x)
             {
                 player.mouseRight = true;
@@ -123,7 +151,7 @@ public class PlayerControllerNet : ScriptableObject
             {
                 player.jabInput = true;
             }
-
+            */
             /*
             //right quad
             if (mouseY >-(mouseX-screenPos.x)+ screenPos.y && mouseY < (mouseX - screenPos.x) + screenPos.y)
@@ -163,7 +191,7 @@ public class PlayerControllerNet : ScriptableObject
                 player.mouseRight = false;
             }
 
-            if (UnityEngine.Input.GetKey(player.left) || UnityEngine.Input.GetKey(player.left))
+            if (UnityEngine.Input.GetKey(player.left) || UnityEngine.Input.GetKey(player.right))
             {
                 player.fSpecInput = true;
             }
