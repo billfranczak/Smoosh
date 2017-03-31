@@ -7,6 +7,7 @@ using System;
 
 public class ChallengerConNet : NetworkBehaviour
 {
+    public GameObject[] players;
 
     public GameObject animObject;
     public GameObject animMesh;
@@ -17,6 +18,7 @@ public class ChallengerConNet : NetworkBehaviour
     public string prof;
 
     public GameObject HitboxPrefab;
+    public GameObject ShieldPrefab;
     public ChallengerConNet self;
 
     public BlankBoxNet bbox;
@@ -55,6 +57,8 @@ public class ChallengerConNet : NetworkBehaviour
     public List<GameObject> hbObjList;
     public List<hitboxNet> hbCompList;
     hitboxNet currentHB;
+
+    public ShieldScriptNet myShield;
 
     RaycastHit hit;
 
@@ -156,7 +160,7 @@ public class ChallengerConNet : NetworkBehaviour
     public int shieldHealth;
     public int shieldHealthMax;
     public int shieldStun;
-
+    public float shieldSize;
 
     public bool intangible;
     public float rollLength;
@@ -280,6 +284,7 @@ public class ChallengerConNet : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
+        
 
         if (!isLocalPlayer)
         {
@@ -287,13 +292,16 @@ public class ChallengerConNet : NetworkBehaviour
             return;
         }
 
+        players = GameObject.FindGameObjectsWithTag("Player");
+        thisPlayer = players.Length;
+        
         camera = Camera.main;
 
         frameData = new FrameData("TMan"); //move to constructor
         moveList = new MoveListNet(this, "TMan");
         profile = new Profiles();
         dmg = 0;
-        thisPlayer = 1;
+        
         //Debug.Log("get renderer");
         p1 = GetComponent<Rigidbody>();
         p1rend = animMesh.GetComponent<Renderer>();
@@ -355,6 +363,7 @@ public class ChallengerConNet : NetworkBehaviour
             CmdSpawnHitboxes3(this.GetComponent<NetworkIdentity>().netId, i);
         }
 
+        
 
         //bbox = new BlankBox(this);
 
@@ -417,6 +426,9 @@ public class ChallengerConNet : NetworkBehaviour
         shieldHealthMax = frameData.maxShield;
         shieldHealth = shieldHealthMax;
         shieldStun = 0;
+        shieldSize = frameData.shieldSize;
+
+        CmdSpawnShield(this.GetComponent<NetworkIdentity>().netId);
 
         //various state related
         land = false;
@@ -1257,6 +1269,23 @@ public class ChallengerConNet : NetworkBehaviour
                     }
                 }
 
+                if (inShield)
+                {
+                    float xPos = 0f;
+                    float yPos = 0f;
+                    if ((float)Math.Sqrt((mouseX - screenPos.x) * (mouseX - screenPos.x) + (mouseY - screenPos.y) * (mouseY - screenPos.y))>1f)
+                    {
+                        xPos = ((mouseX - screenPos.x) / (float)Math.Sqrt((mouseX - screenPos.x) * (mouseX - screenPos.x) + (mouseY - screenPos.y) * (mouseY - screenPos.y)))*.3f;
+                        yPos = ((mouseY - screenPos.y) / (float)Math.Sqrt((mouseX - screenPos.x) * (mouseX - screenPos.x) + (mouseY - screenPos.y) * (mouseY - screenPos.y))) * .3f;
+                    }
+                    else
+                    {
+                        xPos = (mouseX - screenPos.x) * .3f;
+                        yPos = (mouseY - screenPos.y) * .3f;
+                    }
+                    CmdShield(transform.position.x+xPos, transform.position.y + yPos);
+                }
+
                 if (jumpInput && jumps > 0)
                 {
                     state = "jumpsquat";
@@ -1265,17 +1294,17 @@ public class ChallengerConNet : NetworkBehaviour
                     land = false;
                     squatTimer = squatTimerMax;
                     hopTimer = hopTimerMax;
-                }
-
-                if (shieldInput)
-                {
                     inShield = false;
+                    CmdShieldDown();
                 }
+                
 
                 if (shieldInput == false && shieldStun == 0)
                 {
                     shieldTimer = 0;
                     state = "walk";
+                    inShield = false;
+                    CmdShieldDown();
                 }
 
 
@@ -1546,6 +1575,7 @@ public class ChallengerConNet : NetworkBehaviour
                 break;
 
             case "dead":
+                dmg = 0;
                 p1rend.material.color = Color.black;
                 isDead = false;
                 p1.velocity = Vector3.zero;
@@ -1869,12 +1899,16 @@ public class ChallengerConNet : NetworkBehaviour
             currentHB = collider.GetComponent<hitboxNet>();
             if ((currentHB.playerNum != thisPlayer) && currentHB.special == "" && isHit == false && inShield == false && intangible == false)
             {
-                //Debug.Log("extra dildos");
+                //ADD: prevent hit if shielding and not grab
                 p1rend.material.color = Color.magenta;
                 isHit = true;
                 hitstun = 2 * currentHB.dmg; //!!!! this is a temporary hitstun formula!!!!
                 hitstunTimer = hitstun;
                 dmg += currentHB.dmg;
+                inShield = false;
+                CmdShieldDown();
+                //set inshield to false
+
                 //Debug.Log("hs"+hitstun, gameObject);
                 //Debug.Log("hst"+hitstunTimer, gameObject);
             }
@@ -2036,6 +2070,18 @@ public class ChallengerConNet : NetworkBehaviour
     //DeQ parameter list:
     //bool active, int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation
     //int playerNum, float angle, int dmg, int sdmg, bool grab, int priority, float bkb, float skb
+    [Command]
+    public void CmdShield(float x, float y)
+    {
+        myShield.shieldIsUp = true;
+        myShield.sx = x;
+        myShield.sy = y;
+    }
+
+    public void CmdShieldDown()
+    {
+        myShield.shieldIsUp = false;
+    }
 
     [Command]
     public void CmdDeQ(int activeOn, float size, int duration, Vector3 location, bool tethered, Vector3 direction, float rotation,
@@ -2190,12 +2236,38 @@ public class ChallengerConNet : NetworkBehaviour
         c.GetComponent<ChallengerConNet>().hbCompList.Add(HBinstance.GetComponent<hitboxNet>());
         c.GetComponent<ChallengerConNet>().hbCompList[i].p = c.GetComponent<ChallengerConNet>();
         c.GetComponent<ChallengerConNet>().hbCompList[i].offset = i;
-        c.GetComponent<ChallengerConNet>().hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3);
+        c.GetComponent<ChallengerConNet>().hbCompList[i].poffset = thisPlayer;
+        c.GetComponent<ChallengerConNet>().hbCompList[i].transform.position = new Vector3(-10, 5 + 5 * i, 3 * thisPlayer);
 
         NetworkServer.Spawn(HBinstance);
     }
 
-   
+    [Command]
+    void CmdSpawnShield(NetworkInstanceId objID)
+    {
+        GameObject SHinstance = Instantiate(ShieldPrefab);
+        ChallengerConNet c;
+        GameObject obj;
+
+        if (!isServer)
+        {
+            obj = ClientScene.FindLocalObject(objID);
+        }
+        else
+        {
+            obj = NetworkServer.FindLocalObject(objID);
+        }
+        c = obj.GetComponent<ChallengerConNet>();
+        //Debug.Log(objID);
+        c.GetComponent<ChallengerConNet>().myShield=SHinstance.GetComponent<ShieldScriptNet>();
+        c.GetComponent<ChallengerConNet>().myShield.p = c.GetComponent<ChallengerConNet>();
+        c.GetComponent<ChallengerConNet>().myShield.poffset = c.GetComponent<ChallengerConNet>().thisPlayer;
+        c.GetComponent<ChallengerConNet>().myShield.transform.localScale = new Vector3(shieldSize, shieldSize, shieldSize);
+
+        Debug.Log(shieldSize);
+
+        NetworkServer.Spawn(SHinstance);
+    }
 
     [ClientRpc]
     void RpcSpawnHitboxes()

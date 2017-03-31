@@ -36,6 +36,7 @@ public class FrameData : ScriptableObject
     //shield
     public int shieldUp;
     public int maxShield;
+    public float shieldSize;
 
     //dodge
     public int dodgeTime;
@@ -110,6 +111,7 @@ public class FrameData : ScriptableObject
                 //shield
                 shieldUp = 3;
                 maxShield = 100;
+                shieldSize = .3f;
 
                 //dodge
                 dodgeTime = 30;

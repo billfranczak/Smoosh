@@ -60,7 +60,7 @@ public class hitboxNet : NetworkBehaviour
     public string special; //used for weird moves, hitbox listens for updates to this
 
     public int offset; //offsets hitboxes in space
-
+    public int poffset;
     //pass-on traits - spawn a new hitbox when the current one finishes
 
     // Use this for initialization
@@ -104,10 +104,11 @@ public class hitboxNet : NetworkBehaviour
             {
                 pos.position = p.transform.position + location;
                 Vector3 temp = location;
-                temp.x = location.x*Mathf.Cos(rotation) - location.y*Mathf.Sin(rotation);
-                temp.y = location.x * Mathf.Sin(rotation) + location.y * Mathf.Cos(rotation);
-                location = temp;
                 location = location + direction;
+                temp.x = direction.x*Mathf.Cos(rotation) - direction.y*Mathf.Sin(rotation);
+                temp.y = direction.x * Mathf.Sin(rotation) + direction.y * Mathf.Cos(rotation);
+                direction = temp;
+                
             }
             else
             {
@@ -117,7 +118,7 @@ public class hitboxNet : NetworkBehaviour
             //return to offscreen position
             if (duration == 0 || clanked)
             {
-                pos.position = new Vector3(-10, 5 + 5 * offset, 3);
+                pos.position = new Vector3(-10, 5 + 5 * offset, 3 * poffset);
                 hbrend.material.color = Color.yellow;
                 clanked = false;
                 active = false;

@@ -30,11 +30,11 @@ public class PlayerControllerNet : ScriptableObject
         {
             player.inputSelect(player.button2Assign);
         }
-        if (UnityEngine.Input.GetMouseButton(0))
+        if (UnityEngine.Input.GetMouseButton(0) && !(UnityEngine.Input.GetKey(player.modifier1)))
         {
             player.inputSelect(player.mb1);
         }
-        if (UnityEngine.Input.GetMouseButton(1))
+        if (UnityEngine.Input.GetMouseButton(1) && !(UnityEngine.Input.GetKey(player.modifier1)))
         {
             player.inputSelect(player.mb2);
         }
